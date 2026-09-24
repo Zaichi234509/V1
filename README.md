@@ -1,5 +1,7 @@
 # vfxscan
 
+**[See a full example report](docs/example-report.md)** — scored against a clip with known effects.
+
 Point it at a video; it tells you what effects are on it — and shows the
 measurements behind every claim.
 
