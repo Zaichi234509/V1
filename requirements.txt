@@ -1,0 +1,7 @@
+numpy>=1.24
+opencv-python-headless>=4.8
+matplotlib>=3.7
+
+# Provides a static ffmpeg binary when the system has none.
+# vfxscan calls `ffmpeg` from PATH; symlink imageio_ffmpeg's binary if needed.
+imageio-ffmpeg>=0.4.9

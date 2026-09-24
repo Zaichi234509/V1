@@ -1,0 +1,16 @@
+# Generated test media (~31 MB) — rebuild with: python3 tests/make_fixture.py
+tests/fixture_known_effects.mp4
+tests/_tmp/
+
+# Analysis outputs
+analysis_out/
+*_analysis/
+inbox/*
+!inbox/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
