@@ -322,10 +322,10 @@ def analyze_frames(
     stride: int = 1,
     thumb_count: int = 240,
     progress: bool = True,
-) -> tuple[Track, np.ndarray, list[np.ndarray], list[float]]:
+) -> tuple[Track, np.ndarray, list[np.ndarray], list[float], np.ndarray]:
     """Decode once, measure everything.
 
-    Returns (track, hist_matrix, thumbnails, thumbnail_times).
+    Returns (track, hist_matrix, thumbnails, thumbnail_times, proxy_stack).
     """
     cap = cv2.VideoCapture(path)
     if not cap.isOpened():
@@ -336,6 +336,9 @@ def analyze_frames(
 
     tr = Track()
     hists: list[np.ndarray] = []
+    # 64x36 gray proxy per frame (~2 KB) — lets us ask *where* in the frame a
+    # transition is happening, which is what separates a wipe from a dissolve.
+    proxies: list[np.ndarray] = []
     thumbs: list[np.ndarray] = []
     thumb_t: list[float] = []
     planned = (total // stride) if total else 0
@@ -451,6 +454,7 @@ def analyze_frames(
             tr.motion.append(float(np.hypot(dx, dy)))
             tr.dup.append(mad < 0.35)
 
+        proxies.append(cv2.resize(small_gray, (64, 36), interpolation=cv2.INTER_AREA))
         tr.t.append(t)
         tr.idx.append(i)
         prev_small_gray = smallf
@@ -468,7 +472,8 @@ def analyze_frames(
             print(f"  ... {kept} frames analysed ({t:6.1f}s)", flush=True)
 
     cap.release()
-    return tr, np.asarray(hists, dtype=np.float32), thumbs, thumb_t
+    return (tr, np.asarray(hists, dtype=np.float32), thumbs, thumb_t,
+            np.asarray(proxies, dtype=np.uint8))
 
 
 def grab_frames(path: str, times: list[float], max_width: int = 1280) -> list[np.ndarray]:

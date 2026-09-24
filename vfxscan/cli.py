@@ -37,7 +37,7 @@ def run(video: str, out_dir: str, analysis_width: int = 384, stride: int = 1,
     max_frames = int(max_seconds * fps / max(1, stride)) if max_seconds else None
 
     log(f"[2/6] decoding + measuring frames (analysis width {analysis_width}px, stride {stride})")
-    tr, hists, thumbs, thumb_t = metrics.analyze_frames(
+    tr, hists, thumbs, thumb_t, proxy = metrics.analyze_frames(
         video, analysis_width=analysis_width, stride=stride,
         max_frames=max_frames, progress=not quiet)
     if len(tr) < 2:
@@ -55,6 +55,7 @@ def run(video: str, out_dir: str, analysis_width: int = 384, stride: int = 1,
         scenes.detect_zoom_moves(tr, eff_fps),
         scenes.detect_speed_anomalies(tr, fps),
     ])
+    ev = scenes.reclassify_wipes(ev, tr, proxy)
     duration = p.duration_s or track_duration
     shots = scenes.shot_ranges(ev, duration)
     if not shots:

@@ -185,6 +185,63 @@ def detect_dissolves(tr: Track, hists: np.ndarray, min_len: int = 3,
     return out
 
 
+def _wipe_scores(proxy: np.ndarray, a: int, b: int) -> tuple[float, float]:
+    """How spatially *partitioned* is the change across a transition?
+
+    During a dissolve every pixel blends at the same rate, so the fraction of
+    the total change completed so far is uniform across the frame. During a
+    wipe it is ~1 where the new shot has arrived and ~0 where it hasn't, so
+    that fraction varies enormously from row to row (or column to column).
+    Returns (row_score, col_score); larger means more wipe-like.
+    """
+    if b - a < 2:
+        return 0.0, 0.0
+    A = proxy[a].astype(np.float32)
+    B = proxy[b].astype(np.float32)
+    drow = np.abs(B - A).mean(axis=1)
+    dcol = np.abs(B - A).mean(axis=0)
+    # Only meaningful where the two endpoints actually differ.
+    rmask = drow > max(3.0, 0.25 * drow.max())
+    cmask = dcol > max(3.0, 0.25 * dcol.max())
+    if rmask.sum() < 6 or cmask.sum() < 6:
+        return 0.0, 0.0
+    rs, cs = [], []
+    for k in range(a + 1, b):
+        P = proxy[k].astype(np.float32)
+        pr = np.clip(np.abs(P - A).mean(axis=1)[rmask] / drow[rmask], 0.0, 1.5)
+        pc = np.clip(np.abs(P - A).mean(axis=0)[cmask] / dcol[cmask], 0.0, 1.5)
+        rs.append(float(pr.std()))
+        cs.append(float(pc.std()))
+    return (float(np.mean(rs)) if rs else 0.0, float(np.mean(cs)) if cs else 0.0)
+
+
+def reclassify_wipes(events: list[Event], tr: Track, proxy: np.ndarray,
+                     threshold: float = 0.22) -> list[Event]:
+    """Promote dissolves/fades that are actually wipes to their own kind."""
+    if proxy is None or len(proxy) == 0:
+        return events
+    times = np.asarray(tr.t)
+    out: list[Event] = []
+    for e in events:
+        if e.kind not in {"dissolve", "fade_white", "fade_black"}:
+            out.append(e)
+            continue
+        a = int(np.searchsorted(times, e.t_start))
+        b = min(len(proxy) - 1, int(np.searchsorted(times, e.t_end)))
+        rscore, cscore = _wipe_scores(proxy, a, b)
+        best = max(rscore, cscore)
+        if best > threshold:
+            axis = "horizontal band / vertical travel" if rscore >= cscore else "vertical edge / horizontal travel"
+            out.append(Event(
+                "wipe", e.t_start, e.t_end, round(min(0.9, 0.4 + best), 2),
+                f"{axis} — change is spatially partitioned, not uniform "
+                f"(row σ={rscore:.2f}, col σ={cscore:.2f}); reads as a wipe/slice "
+                f"reveal rather than a {e.kind.replace('_', ' ')}"))
+        else:
+            out.append(e)
+    return out
+
+
 def detect_flashes(tr: Track) -> list[Event]:
     n = len(tr)
     if n < 9:
@@ -329,7 +386,7 @@ def merge_events(groups: list[list[Event]]) -> list[Event]:
 
 
 # Events that end one shot and begin another.
-BOUNDARY_KINDS = {"hard_cut", "dissolve", "fade_black", "fade_white", "whip_pan"}
+BOUNDARY_KINDS = {"hard_cut", "dissolve", "fade_black", "fade_white", "wipe", "whip_pan"}
 
 
 def shot_ranges(events: list[Event], duration: float, guard: float = 0.10,

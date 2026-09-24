@@ -304,7 +304,7 @@ def overlay_findings(thumbs: list[np.ndarray], times: list[float]) -> list[Findi
             "Persistent overlay (burned-in text, caption bar, logo or watermark)",
             "Graphics", min(0.85, 0.35 + blobs / 40),
             f"{blobs} edge clusters hold still for the whole video (temporal σ < 6), "
-            f"concentrated in the {zone} third, covering {_pct(cover)} of the frame"))
+            f"concentrated in the {zone} third, covering {cover * 100:.1f}% of the frame"))
 
     # busy, changing graphics => captions / motion text
     ed = np.array([float((cv2.Canny(cv2.cvtColor(t[:h, :w], cv2.COLOR_BGR2GRAY), 60, 180) > 0).mean())
@@ -356,9 +356,14 @@ def consolidate(per_shot: list[tuple[tuple[float, float], list[Finding]]],
 
 def pacing_findings(events: list, duration: float) -> list[Finding]:
     out: list[Finding] = []
-    cuts = sorted(e.t_end for e in events if e.kind == "hard_cut")
-    softs = [e for e in events if e.kind in {"dissolve", "fade_black", "fade_white"}]
-    total_transitions = len(cuts) + len(softs)
+    BOUNDARY = {"hard_cut", "dissolve", "fade_black", "fade_white", "wipe", "whip_pan"}
+    # Median shot length must be measured from *every* shot boundary. Counting
+    # only hard cuts reported an 8.16s median on a video whose longest shot was
+    # 1.4s, because all the other boundaries were dissolves and wipes.
+    cuts = sorted({round(ev.t_end, 3) for ev in events if ev.kind in BOUNDARY})
+    softs = [ev for ev in events
+             if ev.kind in {"dissolve", "fade_black", "fade_white", "wipe"}]
+    total_transitions = len(cuts)
     if duration <= 0:
         return out
 
@@ -381,7 +386,7 @@ def pacing_findings(events: list, duration: float) -> list[Finding]:
         kinds = {}
         for s in softs:
             kinds[s.kind] = kinds.get(s.kind, 0) + 1
-        desc = ", ".join(f"{v}x {k.replace('_', ' ')}" for k, v in kinds.items())
+        desc = ", ".join(f"{v}x {k.replace('_', ' ')}" for k, v in sorted(kinds.items()))
         out.append(Finding(
             "Soft transitions in use", "Editing", 0.75,
             f"{desc} — the editor is blending shots, not only butt-cutting"))

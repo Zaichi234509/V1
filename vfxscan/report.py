@@ -36,7 +36,8 @@ def timeline_chart(tr, events, out_png: str, duration: float) -> str:
     fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
 
     cuts = [e.t_end for e in events if e.kind == "hard_cut"]
-    softs = [e for e in events if e.kind in {"dissolve", "fade_black", "fade_white"}]
+    softs = [e for e in events
+             if e.kind in {"dissolve", "fade_black", "fade_white", "wipe"}]
 
     ax = axes[0]
     ax.plot(t, tr.arr("luma_mean"), lw=1.1, color="#f2c14e", label="mean luma")
@@ -144,6 +145,7 @@ EVENT_LABEL = {
     "whip_pan": "Whip pan / motion-blur transition",
     "zoom_in": "Zoom / punch in",
     "zoom_out": "Zoom out",
+    "wipe": "Wipe / slice reveal",
     "freeze_frame": "Freeze frame",
     "frame_padding": "Duplicate-frame padding",
 }
