@@ -14,5 +14,5 @@ Keying recipe used (OpenCV):
 5. Despill: clamp G to `1.06 · (R + B) / 2`
 6. Crop to the alpha bounding box + 12 px padding
 
-Result: 367×711, 43.5% opaque. Generating the subject on black and flood-filling
+Result: 639×1270, 39.0% opaque. Generating the subject on black and flood-filling
 does **not** work — the key leaks through dark hair and clothing.

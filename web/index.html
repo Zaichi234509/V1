@@ -7,6 +7,21 @@
 <meta name="description" content="Every cut and edit effect detected in a real TikTok edit, rebuilt as scroll-driven web effects with GSAP ScrollTrigger and Lenis." />
 <link rel="preload" as="image" href="/img/layer-bg.jpg" />
 <link rel="preload" as="image" href="/img/hero-char.png" />
+  <script>
+    /* Remote plates are hotlinked from the Unsplash CDN. If that CDN is
+       unreachable (offline, blocked network, rate limit), silently fall back to
+       the bundled local plate so the page never shows a broken image.
+       Capture phase on window is required: resource load errors do not bubble,
+       and this must be registered before <body> starts parsing. */
+    window.addEventListener('error', function (e) {
+      var t = e.target;
+      if (!t || t.tagName !== 'IMG') return;
+      var fb = t.getAttribute('data-fallback');
+      if (!fb || t.dataset.fellBack) return;
+      t.dataset.fellBack = '1';
+      t.src = fb;
+    }, true);
+  </script>
 </head>
 <body>
 
@@ -29,8 +44,8 @@
   <!-- ============ 1. HERO — parallax depth ============ -->
   <section class="stage" id="hero" data-effect="Parallax depth · 4 layers">
     <div class="layers">
-      <div class="layer" data-depth="0.12"><img src="/img/layer-bg.jpg" alt="" /></div>
-      <div class="layer layer--mid" data-depth="0.34"><img src="/img/layer-mid.jpg" alt="" /></div>
+      <div class="layer" data-depth="0.12"><img src="https://images.unsplash.com/photo-1774050468347-32d2a3a50fb9?auto=format&fit=crop&w=1920&q=80" data-fallback="/img/layer-bg.jpg" alt="" /></div>
+      <div class="layer layer--mid" data-depth="0.34"><img src="https://images.unsplash.com/photo-1707635570751-bfb0c3cedc0b?auto=format&fit=crop&w=1600&q=80" data-fallback="/img/layer-mid.jpg" alt="" /></div>
       <div class="layer layer--char" data-depth="0.62">
         <img src="/img/hero-char.png" alt="Illustrated character, the parallax subject" />
       </div>
@@ -64,8 +79,8 @@
         <p class="note">GSAP ScrollTrigger <code>scrub: 1</code>, one tween per layer, driven off a Lenis-smoothed scroll value.</p>
       </div>
       <div class="exploded" id="exploded">
-        <figure><img src="/img/layer-bg.jpg"  alt="" /><figcaption>bg · 0.12</figcaption></figure>
-        <figure><img src="/img/layer-mid.jpg" alt="" /><figcaption>mid · 0.34</figcaption></figure>
+        <figure><img src="https://images.unsplash.com/photo-1774050468347-32d2a3a50fb9?auto=format&fit=crop&w=900&q=80" data-fallback="/img/layer-bg.jpg" alt="" /><figcaption>bg · 0.12</figcaption></figure>
+        <figure><img src="https://images.unsplash.com/photo-1707635570751-bfb0c3cedc0b?auto=format&fit=crop&w=900&q=80" data-fallback="/img/layer-mid.jpg" alt="" /><figcaption>mid · 0.34</figcaption></figure>
         <figure><img src="/img/hero-char.png" alt="" /><figcaption>subject · 0.62</figcaption></figure>
       </div>
     </div>
@@ -74,8 +89,8 @@
   <!-- ============ 3. BAND REVEAL (the signature effect) ============ -->
   <section class="stage stage--tall" id="band" data-effect="Band reveal · masked subject">
     <div class="band-scene">
-      <div class="band-base"><img src="/img/layer-bg.jpg" alt="" /></div>
-      <div class="band-alt" id="band-alt"><img src="/img/layer-alt.jpg" alt="" /></div>
+      <div class="band-base"><img src="https://images.unsplash.com/photo-1707635572440-2618a3779388?auto=format&fit=crop&w=1920&q=80" data-fallback="/img/layer-bg.jpg" alt="" /></div>
+      <div class="band-alt" id="band-alt"><img src="https://images.unsplash.com/photo-1578147063111-9ffec96050cd?auto=format&fit=crop&w=1920&q=80" data-fallback="/img/layer-alt.jpg" alt="" /></div>
       <div class="band-edge" id="band-edge" aria-hidden="true"></div>
       <div class="band-subject"><img src="/img/hero-char.png" alt="" /></div>
     </div>
@@ -92,9 +107,9 @@
   <!-- ============ 4. WHIP PAN ============ -->
   <section class="panel panel--whip" id="whip" data-effect="Whip pan · motion-blur transition">
     <div class="whip-track" id="whip-track">
-      <article class="whip-card"><img src="/img/layer-bg.jpg" alt="" /><h3>Shot A</h3></article>
-      <article class="whip-card"><img src="/img/layer-mid.jpg" alt="" /><h3>Shot B</h3></article>
-      <article class="whip-card"><img src="/img/layer-alt.jpg" alt="" /><h3>Shot C</h3></article>
+      <article class="whip-card"><img src="https://images.unsplash.com/photo-1773318960462-7db320855064?auto=format&fit=crop&w=1200&q=80" data-fallback="/img/layer-bg.jpg" alt="" /><h3>Shot A</h3></article>
+      <article class="whip-card"><img src="https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?auto=format&fit=crop&w=1200&q=80" data-fallback="/img/layer-mid.jpg" alt="" /><h3>Shot B</h3></article>
+      <article class="whip-card"><img src="https://images.unsplash.com/photo-1626173842682-f5a3e20d4b9c?auto=format&fit=crop&w=1200&q=80" data-fallback="/img/layer-alt.jpg" alt="" /><h3>Shot C</h3></article>
     </div>
     <div class="explain explain--center">
       <p class="tag">03 — Whip pan</p>
@@ -117,7 +132,7 @@
         <p class="note">Two blend layers — <code>multiply</code> teal on the lows, <code>screen</code> amber on the highs — plus contrast and saturation.</p>
       </div>
       <div class="grade-frame" id="grade-frame">
-        <img src="/img/layer-bg.jpg" alt="" class="grade-img" />
+        <img src="https://images.unsplash.com/photo-1502689444867-e9d77b2d4758?auto=format&fit=crop&w=1600&q=80" data-fallback="/img/layer-bg.jpg" alt="" class="grade-img" />
         <div class="grade-lo"></div>
         <div class="grade-hi"></div>
         <div class="grade-label"><span id="grade-val">ungraded</span></div>
@@ -136,9 +151,9 @@
     </div>
     <div class="beatgrid" id="beatgrid" aria-hidden="true"></div>
     <div class="beat-frames" id="beat-frames">
-      <img src="/img/layer-bg.jpg"  alt="" class="is-on" />
-      <img src="/img/layer-mid.jpg" alt="" />
-      <img src="/img/layer-alt.jpg" alt="" />
+      <img src="https://images.unsplash.com/photo-1707635571728-866aec3b33c1?auto=format&fit=crop&w=1400&q=80" data-fallback="/img/layer-bg.jpg"  alt="" class="is-on" />
+      <img src="https://images.unsplash.com/photo-1484402628941-0bb40fc029e7?auto=format&fit=crop&w=1400&q=80" data-fallback="/img/layer-mid.jpg" alt="" />
+      <img src="https://images.unsplash.com/photo-1572940639050-49166eb37404?auto=format&fit=crop&w=1400&q=80" data-fallback="/img/layer-alt.jpg" alt="" />
       <img src="/img/frame-hero.jpg" alt="" />
     </div>
   </section>

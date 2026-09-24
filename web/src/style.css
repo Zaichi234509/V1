@@ -175,7 +175,15 @@ code {
 .layer { position: absolute; inset: -8% -4%; will-change: transform; }
 .layer img { width: 100%; height: 100%; object-fit: cover; }
 
-.layer--mid { mix-blend-mode: screen; opacity: .85; }
+/* Screen-blended accent layer. The plate is now a photograph rather than a
+   near-black particle render, and a photo's mid-tones would wash the hero out
+   under `screen`. Crushing the darks first makes the layer behave like a
+   bokeh overlay again: highlights punch through, everything else stays out. */
+.layer--mid {
+  mix-blend-mode: screen;
+  opacity: .6;
+  filter: contrast(1.5) brightness(.8) saturate(1.15);
+}
 
 .layer--char {
   inset: auto 0 -2% 0; height: 92%;
