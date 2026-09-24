@@ -103,21 +103,35 @@ def main() -> int:
     s.check("shot count", "3", str(len(shots)), len(shots) == 3)
 
     # --- effects, with the shot they belong to ---
-    def has(substr: str) -> str | None:
-        for n in names:
-            if substr.lower() in n.lower():
+    def has(needle: str) -> str | None:
+        """Exact name first, then a deterministic prefix/substring fallback.
+
+        A loose substring match is a trap here: "vignette" also matches
+        "Inverse vignette / centre darkening", and set iteration order made
+        which one you got random between runs.
+        """
+        low = needle.lower()
+        ordered = sorted(names)
+        for n in ordered:
+            if n.lower() == low:
+                return n
+        for n in ordered:
+            if n.lower().startswith(low):
+                return n
+        for n in ordered:
+            if low in n.lower():
                 return n
         return None
 
     checks = [
-        ("lifted blacks", "lifted blacks", "0:00.1"),
-        ("vignette", "vignette", "0:00.1"),
-        ("film grain", "film grain", None),
-        ("letterbox", "letterbox", "0:05.1"),
-        ("RGB split", "rgb channel split", "0:05.1"),
-        ("cool cast (shot B)", "cool white balance", "0:05.1"),
-        ("slow zoom", "ken burns", "0:00.1"),
-        ("text overlay", "persistent overlay", None),
+        ("lifted blacks", "Lifted blacks (matte / faded film curve)", "0:00.1"),
+        ("vignette", "Vignette", "0:00.1"),
+        ("film grain", "Film grain / added noise", None),
+        ("letterbox", "Letterbox bars (cinematic crop)", "0:05.1"),
+        ("RGB split", "RGB channel split (glitch / chroma-shift effect)", "0:05.1"),
+        ("cool cast (shot B)", "Cool white balance / blue cast", "0:05.1"),
+        ("slow zoom", "Continuous slow zoom / Ken Burns push-in", "0:00.1"),
+        ("text overlay", "Persistent overlay", None),
     ]
     for label, needle, shot_hint in checks:
         n = has(needle)
@@ -129,7 +143,7 @@ def main() -> int:
     fps_hit = [f for f in data["probe"]["fingerprints"] if "Final Cut" in f]
     s.check("no bogus editor", "no Final Cut Pro", str(fps_hit or "clean"), not fps_hit)
 
-    vig_shot3 = "0:09.1" in where.get(has("vignette") or "", "")
+    vig_shot3 = "0:09.1" in where.get(has("Vignette") or "", "")
     s.check("no vignette on shot C", "absent from 0:09.1", "present" if vig_shot3 else "absent",
             not vig_shot3)
 
