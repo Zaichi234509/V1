@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Edit Decoded — scroll-driven recreations of video effects</title>
+<meta name="description" content="Every cut and edit effect detected in a real TikTok edit, rebuilt as scroll-driven web effects with GSAP ScrollTrigger and Lenis." />
+<link rel="preload" as="image" href="/img/layer-bg.jpg" />
+<link rel="preload" as="image" href="/img/hero-char.png" />
+</head>
+<body>
+
+<!-- Scroll progress: pure CSS scroll-driven animation, JS fallback in main.js -->
+<div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+
+<!-- Full-screen effect overlays -->
+<div class="fx-flash" id="fx-flash" aria-hidden="true"></div>
+<div class="fx-grain" aria-hidden="true"></div>
+<div class="fx-vignette" aria-hidden="true"></div>
+<div class="fx-bars" aria-hidden="true"><i></i><i></i></div>
+
+<header class="topbar">
+  <span class="brand">EDIT<em>DECODED</em></span>
+  <span class="meta" id="hud">00:00 · scroll to play</span>
+</header>
+
+<main>
+
+  <!-- ============ 1. HERO — parallax depth ============ -->
+  <section class="stage" id="hero" data-effect="Parallax depth · 4 layers">
+    <div class="layers">
+      <div class="layer" data-depth="0.12"><img src="/img/layer-bg.jpg" alt="" /></div>
+      <div class="layer layer--mid" data-depth="0.34"><img src="/img/layer-mid.jpg" alt="" /></div>
+      <div class="layer layer--char" data-depth="0.62">
+        <img src="/img/hero-char.png" alt="Illustrated character, the parallax subject" />
+      </div>
+      <div class="layer layer--fore" data-depth="0.92"></div>
+    </div>
+
+    <div class="hero-copy">
+      <p class="kicker">vfxscan → web</p>
+      <h1 class="title">
+        <span class="line"><span>EVERY</span></span>
+        <span class="line"><span>EFFECT</span></span>
+        <span class="line"><span>IN CODE</span></span>
+      </h1>
+      <p class="lede">
+        I analysed a real TikTok edit and measured the effects in it.
+        This page rebuilds each one as a <strong>scroll-driven</strong> web effect —
+        parallax, band reveals, whip pans, flash cuts and split-tone grading.
+      </p>
+      <p class="scroll-hint"><span></span>scroll</p>
+    </div>
+  </section>
+
+  <!-- ============ 2. LAYER SEPARATION ============ -->
+  <section class="panel" id="depth" data-effect="Parallax · depth separation">
+    <div class="panel-inner">
+      <div class="explain">
+        <p class="tag">01 — Parallax</p>
+        <h2>Depth is just <em>speed</em>.</h2>
+        <p>Four layers, four scroll rates. The background moves at 12% of scroll, the
+          subject at 62%, the foreground haze at 92%. Your eye reads the difference as distance.</p>
+        <p class="note">GSAP ScrollTrigger <code>scrub: 1</code>, one tween per layer, driven off a Lenis-smoothed scroll value.</p>
+      </div>
+      <div class="exploded" id="exploded">
+        <figure><img src="/img/layer-bg.jpg"  alt="" /><figcaption>bg · 0.12</figcaption></figure>
+        <figure><img src="/img/layer-mid.jpg" alt="" /><figcaption>mid · 0.34</figcaption></figure>
+        <figure><img src="/img/hero-char.png" alt="" /><figcaption>subject · 0.62</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. BAND REVEAL (the signature effect) ============ -->
+  <section class="stage stage--tall" id="band" data-effect="Band reveal · masked subject">
+    <div class="band-scene">
+      <div class="band-base"><img src="/img/layer-bg.jpg" alt="" /></div>
+      <div class="band-alt" id="band-alt"><img src="/img/layer-alt.jpg" alt="" /></div>
+      <div class="band-edge" id="band-edge" aria-hidden="true"></div>
+      <div class="band-subject"><img src="/img/hero-char.png" alt="" /></div>
+    </div>
+    <div class="band-copy">
+      <p class="tag">02 — Band reveal</p>
+      <h2>The signature move.</h2>
+      <p>A horizontal band opens mid-shot and swaps the background <em>behind</em> the subject,
+        while she stays continuous across the edge. That continuity is the tell: she's a
+        separate masked layer, not part of either plate.</p>
+      <p class="note">Two stacked plates + an animated <code>clip-path: inset()</code>. The cutout sits above both, so it never clips.</p>
+    </div>
+  </section>
+
+  <!-- ============ 4. WHIP PAN ============ -->
+  <section class="panel panel--whip" id="whip" data-effect="Whip pan · motion-blur transition">
+    <div class="whip-track" id="whip-track">
+      <article class="whip-card"><img src="/img/layer-bg.jpg" alt="" /><h3>Shot A</h3></article>
+      <article class="whip-card"><img src="/img/layer-mid.jpg" alt="" /><h3>Shot B</h3></article>
+      <article class="whip-card"><img src="/img/layer-alt.jpg" alt="" /><h3>Shot C</h3></article>
+    </div>
+    <div class="explain explain--center">
+      <p class="tag">03 — Whip pan</p>
+      <h2>Blur sells the speed.</h2>
+      <p>The detector found <strong>19 whip pans</strong> in 16 seconds — each one a spike in
+        global motion paired with a collapse in sharpness. Horizontal travel plus a directional
+        blur that scales with velocity.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5. GRADE ============ -->
+  <section class="panel" id="grade" data-effect="Split tone · teal & orange">
+    <div class="panel-inner panel-inner--grade">
+      <div class="explain">
+        <p class="tag">04 — Colour grade</p>
+        <h2>Cool shadows,<br />warm highlights.</h2>
+        <p>Split toning is measurable: compare red-minus-blue in the shadows against the
+          highlights. In the source clip shadows sat at <strong>R−B −19</strong> and highlights at
+          <strong>+16</strong>. Scroll to drive the grade.</p>
+        <p class="note">Two blend layers — <code>multiply</code> teal on the lows, <code>screen</code> amber on the highs — plus contrast and saturation.</p>
+      </div>
+      <div class="grade-frame" id="grade-frame">
+        <img src="/img/layer-bg.jpg" alt="" class="grade-img" />
+        <div class="grade-lo"></div>
+        <div class="grade-hi"></div>
+        <div class="grade-label"><span id="grade-val">ungraded</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. BEAT CUTS ============ -->
+  <section class="panel panel--beat" id="beat" data-effect="Beat-synced cutting · 177 BPM">
+    <div class="explain explain--center">
+      <p class="tag">05 — Rhythm</p>
+      <h2>Cut on the beat.</h2>
+      <p><strong>100%</strong> of cuts in the source landed within 120 ms of an audio onset, at
+        <strong>177 BPM</strong>. Here the scroll position is the transport — each beat marker
+        triggers a hard cut and a flash.</p>
+    </div>
+    <div class="beatgrid" id="beatgrid" aria-hidden="true"></div>
+    <div class="beat-frames" id="beat-frames">
+      <img src="/img/layer-bg.jpg"  alt="" class="is-on" />
+      <img src="/img/layer-mid.jpg" alt="" />
+      <img src="/img/layer-alt.jpg" alt="" />
+      <img src="/img/frame-hero.jpg" alt="" />
+    </div>
+  </section>
+
+  <!-- ============ 7. INDEX ============ -->
+  <section class="panel panel--index" id="index">
+    <div class="explain explain--center">
+      <p class="tag">Recap</p>
+      <h2>Measured → rebuilt.</h2>
+    </div>
+    <ul class="fx-index" id="fx-index"></ul>
+    <footer class="foot">
+      <p>Built with <strong>GSAP ScrollTrigger</strong> + <strong>Lenis</strong>, with native
+        CSS <code>animation-timeline</code> where the browser supports it.
+        Artwork is AI-generated for this demo.</p>
+    </footer>
+  </section>
+
+</main>
+
+<!-- Grain source: generated, not an image download -->
+<svg class="svg-defs" aria-hidden="true">
+  <filter id="grainFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch" />
+    <feColorMatrix type="saturate" values="0" />
+  </filter>
+</svg>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
