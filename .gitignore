@@ -7,3 +7,4 @@ dist/
 *.log
 renders/
 .DS_Store
+.taste-skill/

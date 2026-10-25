@@ -19,6 +19,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@ffprobe-installer/ffprobe": "^2.1.2",
+    "@fontsource/hanken-grotesk": "^5.3.0",
     "@sparticuz/chromium": "^153.0.0",
     "groq-sdk": "^1.6.0",
     "hyperframes": "^0.8.188",

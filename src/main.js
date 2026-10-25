@@ -1,284 +1,367 @@
-import '@fontsource/bebas-neue/latin-400.css';
-import '@fontsource/manrope/latin-400.css';
-import '@fontsource/manrope/latin-500.css';
-import '@fontsource/manrope/latin-600.css';
-import '@fontsource/manrope/latin-700.css';
-import '@fontsource/manrope/latin-800.css';
+import '@fontsource/hanken-grotesk/latin-400.css';
+import '@fontsource/hanken-grotesk/latin-500.css';
+import '@fontsource/hanken-grotesk/latin-700.css';
+import '@fontsource/hanken-grotesk/latin-600.css';
 import './jp-font.css';
 import './styles.css';
 
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Header, document progress, and the scroll-constructed shot.
-const header = document.querySelector('#site-header');
-const pageProgress = document.querySelector('#page-progress-bar');
-const sequence = document.querySelector('#sequence');
-const sequenceNumber = document.querySelector('#sequence-number');
-const sequenceStep = document.querySelector('#sequence-step');
-const sequenceCopy = document.querySelector('#sequence-copy');
-let sequenceStage = -1;
-let pageFrame = 0;
-
-const sequenceStages = [
-  { number: '02.01', title: 'WIDE', copy: 'Hold the frame. Let the mist settle.' },
-  { number: '02.02', title: 'MASK', copy: 'Open a second shot inside the first.' },
-  { number: '02.03', title: 'CLOSE', copy: 'Cut closer. Let the eyes carry the action.' },
-  { number: '02.04', title: 'IMPACT', copy: 'One bright frame—and the scene changes.' },
+/* ---------------------------------------------------------------------------
+   The seven forms — one source of truth for the index, the dialog, the
+   fly-through cards and the still fallback.
+   ------------------------------------------------------------------------ */
+const forms = [
+  {
+    kanji: '壱',
+    ordinal: 'Form one of seven',
+    title: 'Low Clouds, Distant Haze',
+    lines: ['LOW CLOUDS,', 'DISTANT HAZE'],
+    jp: '垂天遠霞',
+    jpLong: '壱ノ型　垂天遠霞',
+    gloss: 'One direct thrust. He closes the distance and makes a single point of contact.',
+    description:
+      'A direct, powerful frontal thrust. The movement is economical: close the distance at speed and make one precise point of contact.',
+    image: '/images/bright-action.webp',
+    position: '50% 40%',
+  },
+  {
+    kanji: '弐',
+    ordinal: 'Form two of seven',
+    title: 'Eight-Layered Mist',
+    lines: ['EIGHT-LAYERED', 'MIST'],
+    jp: '八重霞',
+    jpLong: '弐ノ型　八重霞',
+    gloss: 'Eight cuts stacked one over another, each leaving less room to answer.',
+    description:
+      'Eight slashes arrive in rapid succession, layered one over another. The rhythm is the weapon — each cut leaves less room for an answer.',
+    image: '/images/action-mist.webp',
+    position: '50% 30%',
+  },
+  {
+    kanji: '参',
+    ordinal: 'Form three of seven',
+    title: 'Scattering Mist Splash',
+    lines: ['SCATTERING', 'MIST SPLASH'],
+    jp: '霞散の飛沫',
+    jpLong: '参ノ型　霞散の飛沫',
+    gloss: 'A circle cut in one breath, wide enough to turn projectiles aside.',
+    description:
+      'A swift circular slash clears the space around the swordsman and can deflect incoming projectiles like mist breaking apart.',
+    image: '/images/leaves.webp',
+    position: '50% 50%',
+  },
+  {
+    kanji: '肆',
+    ordinal: 'Form four of seven',
+    title: 'Shifting Flow Slash',
+    lines: ['SHIFTING FLOW', 'SLASH'],
+    jp: '移流斬り',
+    jpLong: '肆ノ型　移流斬り',
+    gloss: 'From a low stance he flows into a dash, then into the cut.',
+    description:
+      'From a low stance, the swordsman flows into a sudden dash and slash. Stillness and acceleration share a single breath.',
+    image: '/images/hero.webp',
+    position: '52% 45%',
+  },
+  {
+    kanji: '伍',
+    ordinal: 'Form five of seven',
+    title: 'Sea of Clouds and Haze',
+    lines: ['SEA OF CLOUDS', 'AND HAZE'],
+    jp: '霞雲の海',
+    jpLong: '伍ノ型　霞雲の海',
+    gloss: 'A zig-zag charge becomes a barrage, covering ground like cloud.',
+    description:
+      'A blistering zig-zag charge becomes a continuous barrage of slashes, covering a wide area like clouds closing over a landscape.',
+    image: '/images/action-mist.webp',
+    position: '50% 40%',
+  },
+  {
+    kanji: '陸',
+    ordinal: 'Form six of seven',
+    title: 'Lunar Dispersing Mist',
+    lines: ['LUNAR', 'DISPERSING MIST'],
+    jp: '月の霞消',
+    jpLong: '陸ノ型　月の霞消',
+    gloss: 'A somersault of cuts, ending on one decisive vertical line.',
+    description:
+      'An airborne sequence of slashes unfolds around a somersault, ending in a decisive vertical cut through the mist.',
+    image: '/images/bright-action.webp',
+    position: '50% 30%',
+  },
+  {
+    kanji: '漆',
+    ordinal: 'Form seven of seven',
+    title: 'Obscuring Clouds',
+    lines: ['OBSCURING', 'CLOUDS'],
+    jp: '朧',
+    jpLong: '漆ノ型　朧',
+    gloss: 'His own form: tempo broken on purpose, until the eye loses him.',
+    description:
+      'Muichiro’s own creation. He fluctuates his tempo — appearing almost still, then accelerating so abruptly that he seems to vanish into a cloud of mist.',
+    image: '/images/portrait.webp',
+    position: '50% 26%',
+  },
 ];
 
-function updateSequence() {
-  if (!sequence) return;
+/* ---------------------------------------------------------------------------
+   Frame: progress, header tone, reveals, navigation
+   ------------------------------------------------------------------------ */
+const header = document.querySelector('#site-header');
+const pageProgress = document.querySelector('#page-progress-bar');
+const darkSections = ['#blade', '#impact', '#colophon']
+  .map((selector) => document.querySelector(selector))
+  .filter(Boolean);
+const navLinks = [...document.querySelectorAll('.main-nav a')];
 
-  const rect = sequence.getBoundingClientRect();
-  const range = Math.max(1, sequence.offsetHeight - window.innerHeight);
-  const progress = clamp(-rect.top / range);
-  const stripProgress = clamp(progress / 0.48);
-  const portraitProgress = clamp((progress - 0.24) / 0.48);
-  const flashProgress = clamp((progress - 0.55) / 0.09);
-  const flash = !reduceMotion && progress > 0.55 && progress < 0.64
-    ? Math.sin(flashProgress * Math.PI) * 0.72
-    : 0;
+let pageFrame = 0;
 
-  sequence.style.setProperty('--sequence-p', progress.toFixed(4));
-  sequence.style.setProperty('--strip-scale', (0.74 + stripProgress * 0.34).toFixed(4));
-  sequence.style.setProperty('--portrait-reveal', `${100 - portraitProgress * 100}%`);
-  sequence.style.setProperty('--backdrop-scale', (1.15 - progress * 0.1).toFixed(4));
-  sequence.style.setProperty('--flash-opacity', flash.toFixed(3));
-
-  const nextStage = Math.min(3, Math.floor(progress * 4));
-  if (nextStage !== sequenceStage) {
-    sequenceStage = nextStage;
-    const stage = sequenceStages[nextStage];
-    sequenceNumber.textContent = stage.number;
-    sequenceStep.textContent = stage.title;
-    sequenceCopy.textContent = stage.copy;
-  }
+function updateHeaderTone() {
+  const line = header ? header.getBoundingClientRect().bottom - 8 : 64;
+  const onDark = darkSections.some((section) => {
+    const rect = section.getBoundingClientRect();
+    return rect.top <= line && rect.bottom >= line;
+  });
+  header?.setAttribute('data-on-dark', String(onDark));
 }
 
 function updatePage() {
   pageFrame = 0;
   const scrollTop = window.scrollY;
-  const scrollRange = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-  header?.classList.toggle('is-scrolled', scrollTop > 32);
-  if (pageProgress) pageProgress.style.transform = `scaleX(${clamp(scrollTop / scrollRange)})`;
-  updateSequence();
+  const range = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  if (pageProgress) pageProgress.style.transform = `scaleX(${clamp(scrollTop / range).toFixed(4)})`;
+  header?.classList.toggle('is-scrolled', scrollTop > 24);
+  updateHeaderTone();
+  updateHero();
+  updateBeats();
 }
 
 function requestPageUpdate() {
   if (!pageFrame) pageFrame = requestAnimationFrame(updatePage);
 }
 
-window.addEventListener('scroll', requestPageUpdate, { passive: true });
-window.addEventListener('resize', requestPageUpdate);
-updatePage();
+/* ---------------------------------------------------------------------------
+   1. The pinned hero: the name holds still, his portraits and the ground
+   colour change beneath it.
+   ------------------------------------------------------------------------ */
+const heroRun = document.querySelector('#hero-run');
+const heroField = document.querySelector('#hero-field');
+const heroTitle = document.querySelector('#hero-title');
+const heroPortraits = [...document.querySelectorAll('.hero-portrait')];
+let heroIndex = -1;
 
-// Content enters with the same clean mask-like reveals used in the edit.
-const revealItems = document.querySelectorAll('[data-reveal]');
-if ('IntersectionObserver' in window && !reduceMotion) {
-  const revealObserver = new IntersectionObserver((entries, observer) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    }
-  }, { threshold: 0.1, rootMargin: '0px 0px -7% 0px' });
-  revealItems.forEach((item) => revealObserver.observe(item));
-} else {
-  revealItems.forEach((item) => item.classList.add('is-visible'));
+function updateHero() {
+  if (!heroRun || heroPortraits.length === 0) return;
+  const rect = heroRun.getBoundingClientRect();
+  const index = clamp(Math.round(-rect.top / window.innerHeight), 0, heroPortraits.length - 1);
+  if (index === heroIndex) return;
+  heroIndex = index;
+  const portrait = heroPortraits[index];
+  if (heroField) heroField.style.backgroundColor = portrait.dataset.field || '';
+  heroPortraits.forEach((item, itemIndex) => item.classList.toggle('is-current', itemIndex === index));
 }
 
-// Reflect the current chapter in the navigation.
-const navLinks = [...document.querySelectorAll('.main-nav a')];
-const chapters = navLinks
-  .map((link) => document.querySelector(link.getAttribute('href')))
-  .filter(Boolean);
-
-if ('IntersectionObserver' in window) {
-  const chapterObserver = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      navLinks.forEach((link) => {
-        const active = link.getAttribute('href') === `#${entry.target.id}`;
-        link.classList.toggle('is-active', active);
-        if (active) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
-    }
-  }, { rootMargin: '-35% 0px -55% 0px' });
-  chapters.forEach((chapter) => chapterObserver.observe(chapter));
+if (heroTitle) {
+  requestAnimationFrame(() => requestAnimationFrame(() => heroTitle.classList.add('is-in')));
 }
 
-// Small drifting particles provide depth without external canvas libraries.
-const particleField = document.querySelector('#hero-particles');
-if (particleField && !reduceMotion) {
-  const fragment = document.createDocumentFragment();
-  for (let index = 0; index < 26; index += 1) {
-    const particle = document.createElement('i');
-    particle.style.left = `${Math.random() * 100}%`;
-    particle.style.top = `${45 + Math.random() * 60}%`;
-    particle.style.setProperty('--duration', `${7 + Math.random() * 9}s`);
-    particle.style.setProperty('--delay', `${-Math.random() * 12}s`);
-    particle.style.opacity = `${0.2 + Math.random() * 0.5}`;
-    fragment.append(particle);
-  }
-  particleField.append(fragment);
-}
-
-const forms = [
-  {
-    numeral: 'I',
-    ordinal: 'FIRST',
-    title: 'Low Clouds, Distant Haze',
-    jp: '壱ノ型　垂天遠霞',
-    description: 'A direct, powerful frontal thrust. The movement is economical: close the distance at speed and make one precise point of contact.',
-    image: '/images/bright-action.webp',
-    position: 'center',
-  },
-  {
-    numeral: 'II',
-    ordinal: 'SECOND',
-    title: 'Eight-Layered Mist',
-    jp: '弐ノ型　八重霞',
-    description: 'Eight slashes arrive in rapid succession, layered one over another. The rhythm is the weapon—each cut leaves less room for an answer.',
-    image: '/images/action-mist.webp',
-    position: 'center 30%',
-  },
-  {
-    numeral: 'III',
-    ordinal: 'THIRD',
-    title: 'Scattering Mist Splash',
-    jp: '参ノ型　霞散の飛沫',
-    description: 'A swift circular slash clears the space around the swordsman and can deflect incoming projectiles like mist breaking apart.',
-    image: '/images/leaves.webp',
-    position: 'center',
-  },
-  {
-    numeral: 'IV',
-    ordinal: 'FOURTH',
-    title: 'Shifting Flow Slash',
-    jp: '肆ノ型　移流斬り',
-    description: 'From a low stance, the swordsman flows into a sudden dash and slash. Stillness and acceleration share a single breath.',
-    image: '/images/hero.webp',
-    position: 'center',
-  },
-  {
-    numeral: 'V',
-    ordinal: 'FIFTH',
-    title: 'Sea of Clouds and Haze',
-    jp: '伍ノ型　霞雲の海',
-    description: 'A blistering zig-zag charge becomes a continuous barrage of slashes, covering a wide area like clouds closing over a landscape.',
-    image: '/images/action-mist.webp',
-    position: 'center 32%',
-  },
-  {
-    numeral: 'VI',
-    ordinal: 'SIXTH',
-    title: 'Lunar Dispersing Mist',
-    jp: '陸ノ型　月の霞消',
-    description: 'An airborne sequence of slashes unfolds around a somersault, ending in a decisive vertical cut through the mist.',
-    image: '/images/bright-action.webp',
-    position: 'center',
-  },
-  {
-    numeral: 'VII',
-    ordinal: 'SEVENTH',
-    title: 'Obscuring Clouds',
-    jp: '漆ノ型　朧',
-    description: 'Muichiro’s own creation. He fluctuates his tempo—appearing almost still, then accelerating so abruptly that he seems to vanish into a cloud of mist.',
-    image: '/images/portrait.webp',
-    position: 'center 26%',
-  },
-];
-
-const formIndex = document.querySelector('#form-index');
+/* ---------------------------------------------------------------------------
+   2. The seven forms: the photograph holds, the index moves.
+   ------------------------------------------------------------------------ */
+const formList = document.querySelector('#form-list');
+const formsFrame = document.querySelector('.forms__frame');
+const formsImage = document.querySelector('#forms-image');
+const formsCaption = document.querySelector('#forms-caption');
 const formDialog = document.querySelector('#form-dialog');
-const formDialogImage = document.querySelector('#form-dialog-image');
-const formDialogKicker = document.querySelector('#form-dialog-kicker');
-const formDialogNumber = document.querySelector('#form-dialog-number');
-const formDialogJp = document.querySelector('#form-dialog-jp');
-const formDialogTitle = document.querySelector('#form-dialog-title');
-const formDialogDescription = document.querySelector('#form-dialog-description');
-const formDialogCount = document.querySelector('#form-dialog-count');
+const dialogImage = document.querySelector('#form-dialog-image');
+const dialogKicker = document.querySelector('#form-dialog-kicker');
+const dialogJp = document.querySelector('#form-dialog-jp');
+const dialogTitle = document.querySelector('#form-dialog-title');
+const dialogDescription = document.querySelector('#form-dialog-description');
+const dialogCount = document.querySelector('#form-dialog-count');
 let activeForm = 0;
+let imageTimer = 0;
 
-if (formIndex) {
-  formIndex.innerHTML = forms.map((form, index) => `
-    <li>
-      <button type="button" data-form-index="${index}" aria-label="Open ${form.ordinal.toLowerCase()} form: ${form.title}">
-        <span>${form.numeral}</span>
-        <small>${form.title}</small>
-      </button>
-    </li>
-  `).join('');
+if (formList) {
+  formList.innerHTML = forms
+    .map(
+      (form, index) => `
+      <li class="form-row${index === 0 ? ' is-active' : ''}" data-index="${index}">
+        <button type="button" data-form-index="${index}" aria-label="Open ${form.ordinal}: ${form.title}">
+          <span class="form-row__kanji" lang="ja" aria-hidden="true">${form.kanji}</span>
+          <span class="form-row__name">${form.title}</span>
+          <span class="form-row__jp" lang="ja">${form.jp}</span>
+          <span class="form-row__gloss"><span>${form.gloss}</span></span>
+        </button>
+      </li>`,
+    )
+    .join('');
 }
+
+function setActiveForm(index) {
+  if (!formsImage) return;
+  const next = (index + forms.length) % forms.length;
+  if (next === activeForm && formsImage.dataset.index === String(next)) return;
+  activeForm = next;
+  const form = forms[next];
+
+  document.querySelectorAll('.form-row').forEach((row) => {
+    row.classList.toggle('is-active', Number(row.dataset.index) === next);
+  });
+
+  window.clearTimeout(imageTimer);
+  formsFrame?.classList.add('is-swapping');
+  imageTimer = window.setTimeout(() => {
+    formsImage.src = form.image;
+    formsImage.style.objectPosition = form.position;
+    formsImage.alt = `${form.title}, ${form.ordinal.toLowerCase()} of Mist Breathing.`;
+    formsImage.dataset.index = String(next);
+    if (formsCaption) formsCaption.textContent = `${form.kanji} — ${form.gloss}`;
+    formsFrame?.classList.remove('is-swapping');
+  }, 180);
+}
+
+formList?.addEventListener('pointerover', (event) => {
+  const button = event.target.closest('[data-form-index]');
+  if (button) setActiveForm(Number(button.dataset.formIndex));
+});
+
+formList?.addEventListener('focusin', (event) => {
+  const button = event.target.closest('[data-form-index]');
+  if (button) setActiveForm(Number(button.dataset.formIndex));
+});
 
 function updateFormDialog(index) {
   activeForm = (index + forms.length) % forms.length;
   const form = forms[activeForm];
-  formDialogImage.src = form.image;
-  formDialogImage.alt = `Muichiro artwork accompanying ${form.title}`;
-  formDialogImage.style.objectPosition = form.position;
-  formDialogKicker.textContent = `MIST BREATHING / ${form.ordinal} FORM`;
-  formDialogNumber.textContent = form.numeral;
-  formDialogJp.textContent = form.jp;
-  formDialogTitle.textContent = form.title.toUpperCase();
-  formDialogDescription.textContent = form.description;
-  formDialogCount.textContent = `${String(activeForm + 1).padStart(2, '0')} / 07`;
-}
-
-function openForm(index) {
-  updateFormDialog(index);
-  if (!formDialog.open) formDialog.showModal();
+  dialogImage.src = form.image;
+  dialogImage.alt = `Muichiro artwork accompanying ${form.title}.`;
+  dialogImage.style.objectPosition = form.position;
+  dialogKicker.textContent = `Mist Breathing, ${form.ordinal.toLowerCase()}`;
+  dialogJp.textContent = form.jpLong;
+  dialogTitle.textContent = form.title;
+  dialogDescription.textContent = form.description;
+  dialogCount.textContent = `form ${activeForm + 1} of 7`;
 }
 
 document.addEventListener('click', (event) => {
-  const formButton = event.target.closest('[data-form-index]');
-  if (formButton) openForm(Number(formButton.dataset.formIndex));
+  const button = event.target.closest('[data-form-index]');
+  if (!button) return;
+  updateFormDialog(Number(button.dataset.formIndex));
+  if (formDialog && !formDialog.open) formDialog.showModal();
 });
 
 document.querySelector('#previous-form')?.addEventListener('click', () => updateFormDialog(activeForm - 1));
 document.querySelector('#next-form')?.addEventListener('click', () => updateFormDialog(activeForm + 1));
-document.querySelector('#close-form')?.addEventListener('click', () => formDialog.close());
+document.querySelector('#close-form')?.addEventListener('click', () => formDialog?.close());
 
-// Native dialogs close on Escape; these helpers also support backdrop clicks.
-function enableBackdropClose(dialog) {
-  dialog?.addEventListener('click', (event) => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    const inside = event.clientX >= rect.left && event.clientX <= rect.right
-      && event.clientY >= rect.top && event.clientY <= rect.bottom;
-    if (!inside) dialog.close();
-  });
+/* ---------------------------------------------------------------------------
+   3. The blade: a scroll-driven fly-through, with a designed still version
+   for reduced motion, no WebGL or a failed script.
+   ------------------------------------------------------------------------ */
+const bladeSection = document.querySelector('#blade');
+const bladeStage = document.querySelector('.blade-stage');
+const bladeCanvas = document.querySelector('#blade-canvas');
+const bladeRest = document.querySelector('#blade-rest');
+const bladeRestGrid = document.querySelector('#blade-rest-grid');
+const bladeBeats = [...document.querySelectorAll('.blade-beat')];
+const bladeStatus = document.querySelector('#blade-status');
+let bladeScene = null;
+let bladeRequested = false;
+
+if (bladeRestGrid) {
+  bladeRestGrid.innerHTML = forms
+    .map(
+      (form) => `
+      <li>
+        <img src="${form.image}" width="768" height="432" alt="" loading="lazy" />
+        <b lang="ja">${form.kanji}</b>
+        <span>${form.title}</span>
+      </li>`,
+    )
+    .join('');
 }
 
-enableBackdropClose(formDialog);
+function showBladeRest(message) {
+  bladeSection?.classList.add('is-rest');
+  bladeRest?.removeAttribute('hidden');
+  bladeCanvas?.setAttribute('hidden', '');
+  document.querySelector('.blade-beats')?.setAttribute('hidden', '');
+  document.querySelector('.blade-hud p')?.setAttribute('hidden', '');
+  const motionButton = document.querySelector('#blade-motion');
+  if (motionButton) motionButton.hidden = true;
+  if (bladeStatus && message) bladeStatus.textContent = message;
+}
 
-const creditsDialog = document.querySelector('#credits-dialog');
-document.querySelector('#open-credits')?.addEventListener('click', () => creditsDialog.showModal());
-document.querySelector('#close-credits')?.addEventListener('click', () => creditsDialog.close());
-enableBackdropClose(creditsDialog);
+function updateBeats() {
+  if (!bladeSection || bladeSection.classList.contains('is-rest') || bladeBeats.length === 0) return;
+  const rect = bladeSection.getBoundingClientRect();
+  const range = Math.max(1, bladeSection.offsetHeight - window.innerHeight);
+  const progress = clamp(-rect.top / range, 0, 1);
+  const index = progress < 0.24 ? 0 : progress < 0.62 ? 1 : 2;
+  bladeBeats.forEach((beat, beatIndex) => beat.classList.toggle('is-current', beatIndex === index));
+}
 
-// A manual impact frame lets visitors feel the flash / RGB / shake treatment.
-const impactScene = document.querySelector('#impact');
+async function loadBladeScene() {
+  if (bladeRequested || !bladeCanvas) return;
+  bladeRequested = true;
+  try {
+    const { createBladeScene } = await import('./fly-scene.js');
+    bladeScene = await createBladeScene({
+      canvas: bladeCanvas,
+      section: bladeSection,
+      stage: bladeStage,
+      motionButton: document.querySelector('#blade-motion'),
+      status: bladeStatus,
+      forms,
+      reducedMotion: reduceMotion,
+    });
+    bladeStage?.classList.add('is-live');
+  } catch (error) {
+    console.error('The three-dimensional blade could not start.', error);
+    showBladeRest('The three-dimensional view is unavailable; the seven forms are shown held still.');
+  }
+}
+
+if (bladeSection) {
+  if (reduceMotion) {
+    showBladeRest('The seven forms are shown held still.');
+  } else if ('IntersectionObserver' in window) {
+    const loader = new IntersectionObserver((entries, observer) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      loadBladeScene();
+    }, { rootMargin: '120% 0px' });
+    loader.observe(bladeSection);
+  } else {
+    loadBladeScene();
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4. Obscuring Clouds: the impact frame, struck by hand
+   ------------------------------------------------------------------------ */
+const impact = document.querySelector('#impact');
 const impactStatus = document.querySelector('#impact-status');
 let impactTimer = 0;
 
 document.querySelector('#strike-button')?.addEventListener('click', () => {
   window.clearTimeout(impactTimer);
-  impactScene.classList.remove('is-striking');
-  void impactScene.offsetWidth;
-  impactScene.classList.add('is-striking');
-  impactStatus.textContent = 'Impact frame triggered.';
-  impactTimer = window.setTimeout(() => impactScene.classList.remove('is-striking'), 700);
+  impact.classList.remove('is-striking');
+  void impact.offsetWidth;
+  impact.classList.add('is-striking');
+  if (impactStatus) impactStatus.textContent = 'Impact frame struck.';
+  impactTimer = window.setTimeout(() => impact.classList.remove('is-striking'), 700);
 });
 
-// Full-screen, 16-second replay of the reference video's visual grammar.
+/* ---------------------------------------------------------------------------
+   The 16-second edit, replayed in a dialog
+   ------------------------------------------------------------------------ */
 const reelDialog = document.querySelector('#reel-dialog');
 const reelStage = document.querySelector('#reel-stage');
 const reelToggle = document.querySelector('#reel-toggle');
-const reelRestart = document.querySelector('#reel-restart');
 const reelProgress = document.querySelector('#reel-progress-bar');
 const reelTime = document.querySelector('#reel-time');
 const reelScenes = [...document.querySelectorAll('.reel-scene')].map((element) => ({
@@ -292,13 +375,14 @@ let reelStartedAt = 0;
 let reelFrame = 0;
 let reelPlaying = false;
 
-reelStage.tabIndex = -1;
+if (reelStage) reelStage.tabIndex = -1;
 
-function setReelPlayingState() {
-  reelDialog.classList.toggle('is-paused', !reelPlaying);
+function setReelState() {
+  reelDialog?.classList.toggle('is-paused', !reelPlaying);
+  if (!reelToggle) return;
   const icon = reelPlaying ? 'pause' : 'play';
   reelToggle.innerHTML = `<svg class="ui-icon" aria-hidden="true"><use href="#icon-${icon}" /></svg>`;
-  reelToggle.setAttribute('aria-label', reelPlaying ? 'Pause visual edit' : 'Play visual edit');
+  reelToggle.setAttribute('aria-label', reelPlaying ? 'Pause the visual edit' : 'Play the visual edit');
 }
 
 function renderReel(time) {
@@ -306,21 +390,21 @@ function renderReel(time) {
   for (const scene of reelScenes) {
     scene.element.classList.toggle('is-active', sceneTime >= scene.start && sceneTime < scene.end);
   }
-  reelProgress.style.transform = `scaleX(${clamp(time / reelDuration)})`;
+  if (reelProgress) reelProgress.style.transform = `scaleX(${clamp(time / reelDuration).toFixed(4)})`;
   const seconds = Math.min(16, Math.floor(time / 1000));
-  reelTime.value = `00:${String(seconds).padStart(2, '0')} / 00:16`;
-  reelTime.textContent = reelTime.value;
+  if (reelTime) {
+    reelTime.value = `00:${String(seconds).padStart(2, '0')} / 00:16`;
+    reelTime.textContent = reelTime.value;
+  }
 }
 
 function tickReel(now) {
   if (!reelPlaying) return;
   reelElapsed = Math.min(reelDuration, now - reelStartedAt);
   renderReel(reelElapsed);
-
   if (reelElapsed >= reelDuration) {
     reelPlaying = false;
-    setReelPlayingState();
-    reelToggle.setAttribute('aria-label', 'Replay visual edit');
+    setReelState();
     return;
   }
   reelFrame = requestAnimationFrame(tickReel);
@@ -331,25 +415,19 @@ function playReel(reset = false) {
   if (reset || reelElapsed >= reelDuration) {
     reelElapsed = 0;
     reelScenes.forEach((scene) => scene.element.classList.remove('is-active'));
-    void reelStage.offsetWidth;
+    if (reelStage) void reelStage.offsetWidth;
     renderReel(0);
   }
   reelPlaying = true;
   reelStartedAt = performance.now() - reelElapsed;
-  setReelPlayingState();
+  setReelState();
   reelFrame = requestAnimationFrame(tickReel);
 }
 
 function pauseReel() {
   reelPlaying = false;
   cancelAnimationFrame(reelFrame);
-  setReelPlayingState();
-}
-
-function openReel() {
-  if (!reelDialog.open) reelDialog.showModal();
-  reelStage.focus({ preventScroll: true });
-  playReel(true);
+  setReelState();
 }
 
 function toggleReel() {
@@ -357,10 +435,17 @@ function toggleReel() {
   else playReel(reelElapsed >= reelDuration);
 }
 
-document.querySelectorAll('[data-open-reel]').forEach((button) => button.addEventListener('click', openReel));
-document.querySelector('#close-reel')?.addEventListener('click', () => reelDialog.close());
+document.querySelectorAll('[data-open-reel]').forEach((button) =>
+  button.addEventListener('click', () => {
+    if (!reelDialog?.open) reelDialog?.showModal();
+    reelStage?.focus({ preventScroll: true });
+    playReel(true);
+  }),
+);
+
+document.querySelector('#close-reel')?.addEventListener('click', () => reelDialog?.close());
 reelToggle?.addEventListener('click', toggleReel);
-reelRestart?.addEventListener('click', () => playReel(true));
+document.querySelector('#reel-restart')?.addEventListener('click', () => playReel(true));
 
 reelDialog?.addEventListener('close', () => {
   pauseReel();
@@ -375,47 +460,69 @@ reelDialog?.addEventListener('keydown', (event) => {
   }
 });
 
-// Load the WebGL scene only when it approaches the viewport.
-const mist3dSection = document.querySelector('#mist-3d');
-if (mist3dSection) {
-  let mistSceneRequested = false;
-
-  const loadMistScene = async () => {
-    if (mistSceneRequested) return;
-    mistSceneRequested = true;
-
-    const status = document.querySelector('#mist-3d-loading');
-    try {
-      const { createMistScene } = await import('./mist-scene.js');
-      createMistScene({
-        canvas: document.querySelector('#mist-3d-canvas'),
-        section: mist3dSection,
-        stage: document.querySelector('#mist-3d-stage'),
-        status,
-        progress: document.querySelector('#mist-3d-progress'),
-        motionButton: document.querySelector('#mist-motion'),
-        resetButton: document.querySelector('#mist-reset'),
-        reducedMotion: reduceMotion,
-      });
-    } catch (error) {
-      console.error('The 3D mist scene could not be initialized.', error);
-      document.querySelector('#mist-3d-canvas').hidden = true;
-      document.querySelector('#mist-3d-fallback').hidden = false;
-      document.querySelector('#mist-3d-stage').classList.add('is-unavailable');
-      status.textContent = '3D view unavailable — showing the artwork instead.';
-      document.querySelector('#mist-motion').disabled = true;
-      document.querySelector('#mist-reset').disabled = true;
-    }
-  };
-
-  if ('IntersectionObserver' in window) {
-    const mistSceneLoader = new IntersectionObserver((entries, observer) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      loadMistScene();
-    }, { rootMargin: '100% 0px' });
-    mistSceneLoader.observe(mist3dSection);
-  } else {
-    loadMistScene();
-  }
+/* ---------------------------------------------------------------------------
+   Dialogs, reveals, navigation, and the page loop
+   ------------------------------------------------------------------------ */
+function enableBackdropClose(dialog) {
+  dialog?.addEventListener('click', (event) => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  });
 }
+
+const creditsDialog = document.querySelector('#credits-dialog');
+document.querySelector('#open-credits')?.addEventListener('click', () => creditsDialog?.showModal());
+document.querySelector('#close-credits')?.addEventListener('click', () => creditsDialog?.close());
+enableBackdropClose(formDialog);
+enableBackdropClose(creditsDialog);
+
+const revealItems = document.querySelectorAll('[data-reveal]');
+revealItems.forEach((element) => element.classList.add('reveal'));
+if ('IntersectionObserver' in window && !reduceMotion) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.04, rootMargin: '0px 0px 12% 0px' },
+  );
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add('is-visible'));
+}
+
+const chapters = navLinks
+  .map((link) => document.querySelector(link.getAttribute('href')))
+  .filter(Boolean);
+
+if ('IntersectionObserver' in window) {
+  const chapterObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        navLinks.forEach((link) => {
+          const active = link.getAttribute('href') === `#${entry.target.id}`;
+          link.classList.toggle('is-active', active);
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }
+    },
+    { rootMargin: '-45% 0px -45% 0px' },
+  );
+  chapters.forEach((chapter) => chapterObserver.observe(chapter));
+}
+
+window.addEventListener('scroll', requestPageUpdate, { passive: true });
+window.addEventListener('resize', requestPageUpdate);
+document.addEventListener('visibilitychange', requestPageUpdate);
+updatePage();
