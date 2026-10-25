@@ -3,15 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#071114" />
+    <meta name="theme-color" content="#dde9e6" />
     <meta
       name="description"
-      content="Muichiro Tokito — a cinematic, interactive character study in mist, motion, and seven sword forms."
+      content="Muichiro Tokitō, the Mist Hashira: seven forms of Mist Breathing, a blade you can turn in three dimensions, and the stillness that follows."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" as="image" href="/images/hero.webp" fetchpriority="high" />
-    <title>Muichiro — Into the Mist</title>
-    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preload" as="image" href="/images/portrait.webp" fetchpriority="high" />
+    <title>MUICHIRO — The Mist Hashira</title>
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -27,243 +29,245 @@
         <symbol id="icon-bolt" viewBox="0 0 20 20"><path d="m11 1-7 10h5l-1 8 8-11h-5Z" fill="currentColor" stroke="none" /></symbol>
       </defs>
     </svg>
+
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="grain" aria-hidden="true"></div>
     <div class="page-progress" aria-hidden="true"><span id="page-progress-bar"></span></div>
 
     <header class="site-header" id="site-header">
-      <a class="brand" href="#top" aria-label="Muichiro — back to top">
-        <span class="brand__mark" aria-hidden="true">霞</span>
-        <span class="brand__text">TOKITO<br /><small>CHARACTER STUDY 001</small></span>
+      <a class="wordmark" href="#top">
+        <span class="wordmark__kanji" lang="ja" aria-hidden="true">霞</span>
+        <span class="wordmark__text">Into the Mist</span>
       </a>
-      <nav class="main-nav" aria-label="Main navigation">
-        <a href="#edit">The edit</a>
+      <nav class="main-nav" aria-label="Sections of this study">
         <a href="#forms">Seven forms</a>
-        <a href="#mist-3d">3D form</a>
-        <a href="#impact">Impact</a>
-        <a href="#legacy">Legacy</a>
+        <a href="#blade">The blade</a>
+        <a href="#impact">Obscuring Clouds</a>
+        <a href="#memory">Memory</a>
       </nav>
-      <button class="play-button" type="button" data-open-reel>
-        <span class="play-button__icon" aria-hidden="true"></span>
-        <span>Play 16s edit</span>
+      <button class="button button--solid" type="button" data-open-reel>
+        <svg class="ui-icon" aria-hidden="true"><use href="#icon-play" /></svg>
+        Play the 16s edit
       </button>
     </header>
 
     <main id="main">
-      <section class="hero" id="top" aria-labelledby="hero-title">
-        <div class="hero__media" aria-hidden="true">
-          <img src="/images/hero.webp" alt="" fetchpriority="high" />
-        </div>
-        <div class="hero__mist" aria-hidden="true"></div>
-        <div class="hero__particles" id="hero-particles" aria-hidden="true"></div>
-        <div class="hero__kanji" aria-hidden="true">霞</div>
+      <!-- 1. THE PINNED TITLE: the name holds still while his portraits pass beneath it. -->
+      <section class="pinned-hero" id="top" aria-labelledby="hero-title">
+        <div class="pinned-hero__run" id="hero-run">
+          <div class="pinned-hero__field" id="hero-field" aria-hidden="true"></div>
+          <div class="pinned-hero__stage">
 
-        <div class="hero__rail hero__rail--left" aria-hidden="true">
-          <span>DEMON SLAYER</span><span>MIST HASHIRA</span><span>EST. IN THE UNSEEN</span>
-        </div>
-        <div class="hero__jp" aria-hidden="true">
-          <span>時透</span><span>無一郎</span><small>霞柱</small>
-        </div>
+            <h1 class="pinned-hero__title" id="hero-title">
+              <span class="pinned-hero__title-line">MUICHIRO</span>
+              <span class="pinned-hero__title-line pinned-hero__title-line--outline" lang="ja">時透 無一郎</span>
+            </h1>
 
-        <div class="hero__content">
-          <p class="eyebrow hero__eyebrow"><span>01</span> A character study in motion</p>
-          <h1 class="hero__title" id="hero-title">
-            <span class="hero__title-solid" data-text="MUICHIRO">MUICHIRO</span>
-            <span class="hero__title-outline">TOKITŌ</span>
-          </h1>
-          <div class="hero__footer">
-            <p class="hero__tagline">The blade you never see.<br /><span>A mind above the clouds.</span></p>
-            <div class="hero__actions">
-              <a class="button button--light" href="#edit">Enter the mist <svg class="ui-icon" aria-hidden="true"><use href="#icon-down-right" /></svg></a>
-              <button class="text-button" type="button" data-open-reel>Replay the edit <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></button>
+            <div class="pinned-hero__sentence">
+              <p>
+                <span class="hero-sentence--long">The Mist Hashira of <cite>Demon Slayer</cite> — fourteen years old, seven forms, and gone from the frame before the cut lands.</span>
+                <span class="hero-sentence--short">The Mist Hashira of <cite>Demon Slayer</cite>. Fourteen, seven forms, gone before the cut lands.</span>
+              </p>
+              <p class="pinned-hero__cue">Scroll: the ground and the portrait change under the name.</p>
+            </div>
+
+            <div class="pinned-hero__action">
+              <a class="button button--solid" href="#forms">
+                Start with the seven forms
+                <svg class="ui-icon" aria-hidden="true"><use href="#icon-down-right" /></svg>
+              </a>
             </div>
           </div>
-        </div>
 
-        <div class="hero__timecode" aria-hidden="true">
-          <span>00:00:00</span>
-          <div class="hero__timeline"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <span>00:16:00</span>
+          <ul class="hero-portraits" id="hero-portraits">
+            <li class="hero-portrait is-current" data-field="#dde9e6">
+              <figure>
+                <img src="/images/portrait.webp" width="683" height="1024" alt="Muichiro holding his Nichirin blade upright in the mist." fetchpriority="high" />
+                <figcaption>Form seven, <span lang="ja">朧</span> — the blade held still, then not.</figcaption>
+              </figure>
+            </li>
+            <li class="hero-portrait" data-field="#cfe0dd">
+              <figure>
+                <img src="/images/quiet.webp" width="720" height="1395" alt="Muichiro standing on wet stones in a pale, mist-covered forest." loading="lazy" />
+                <figcaption>Between breaths, a stream and no sound at all.</figcaption>
+              </figure>
+            </li>
+          </ul>
         </div>
-        <a class="scroll-cue" href="#edit"><span>Scroll to explore</span><i aria-hidden="true"></i></a>
       </section>
 
-      <section class="manifesto" id="edit" aria-labelledby="manifesto-title">
-        <div class="section-heading" data-reveal>
-          <p class="eyebrow"><span>01 / THE EDIT</span> Stillness is a setup</p>
-        </div>
-        <div class="manifesto__grid">
-          <h2 id="manifesto-title" data-reveal>
-            CALM IS NOT<br />THE ABSENCE<br /><em>OF POWER.</em>
-          </h2>
-          <div class="manifesto__aside" data-reveal>
-            <span class="vertical-label" aria-hidden="true">霞の呼吸</span>
-            <p>
-              Muichiro Tokito fights like a cut in an action edit: the wide shot is quiet,
-              the close-up is sudden, and the impact is over before the eye can catch up.
+      <!-- 2. THE FORMS: a photograph holds still while the index moves past it. -->
+      <section class="forms" id="forms" aria-labelledby="forms-title">
+        <header class="forms__intro" data-reveal>
+          <h2 id="forms-title">Seven forms,<br />one vanishing point.</h2>
+          <p>
+            Mist Breathing descends from Wind Breathing and turns tempo into misdirection. Muichiro
+            learned six forms from the manuals; the seventh he invented himself, and it is the reason
+            people cannot describe what they saw.
+          </p>
+        </header>
+
+        <div class="forms__body">
+          <div class="forms__figure" data-reveal>
+            <div class="forms__frame">
+              <img
+                id="forms-image"
+                src="/images/bright-action.webp"
+                width="768"
+                height="432"
+                alt="Muichiro drawing his blade through pale mist."
+              />
+            </div>
+            <p class="forms__caption" id="forms-caption">Form one — the thrust that closes the distance.</p>
+          </div>
+
+          <div class="forms__index" data-reveal>
+            <ol class="form-list" id="form-list"></ol>
+            <p class="forms__note">
+              Point at a form to see it, select one to read the full description.
             </p>
-            <p class="muted">Scroll through the same visual language—reframed for the Mist Hashira.</p>
-          </div>
-        </div>
-        <div class="technique-rail" data-reveal aria-label="Editing techniques used">
-          <span><b>01</b> Wide <svg class="ui-icon" aria-hidden="true"><use href="#icon-right" /></svg> close</span>
-          <span><b>02</b> Mask reveal</span>
-          <span><b>03</b> Impact frame</span>
-          <span><b>04</b> Split screen</span>
-        </div>
-      </section>
-
-      <section class="scroll-sequence" id="sequence" aria-label="Scroll-driven mist sequence">
-        <div class="sequence-sticky">
-          <div class="sequence-backdrop" aria-hidden="true"><img src="/images/dark.webp" alt="" /></div>
-          <div class="sequence-ghost" aria-hidden="true">MIST</div>
-          <div class="sequence-strip" aria-hidden="true"><img src="/images/bright-action.webp" alt="" /></div>
-          <div class="sequence-portrait" aria-hidden="true"><img src="/images/portrait.webp" alt="" /></div>
-          <div class="sequence-slash" aria-hidden="true"></div>
-          <div class="sequence-flash" aria-hidden="true"></div>
-          <div class="sequence-ui">
-            <p class="eyebrow"><span id="sequence-number">02.01</span> Shot construction</p>
-            <div class="sequence-caption">
-              <span id="sequence-step">WIDE</span>
-              <p id="sequence-copy">Hold the frame. Let the mist settle.</p>
-            </div>
-            <div class="sequence-meter" aria-hidden="true"><span id="sequence-meter-bar"></span></div>
           </div>
         </div>
       </section>
 
-      <section class="forms-section" id="forms" aria-labelledby="forms-title">
-        <div class="forms-section__heading">
-          <div data-reveal>
-            <p class="eyebrow"><span>02 / MIST BREATHING</span> Seven forms</p>
-            <h2 id="forms-title">SEVEN FORMS.<br /><em>ONE VANISHING POINT.</em></h2>
-          </div>
-          <p data-reveal>
-            Derived from Wind Breathing, Mist Breathing turns tempo into misdirection.
-            Select a frame to explore the technique behind it.
+      <!-- 3. THE BLADE: a scroll-driven fly-through of the seven forms. -->
+      <section class="blade-scene" id="blade" aria-labelledby="blade-title">
+        <div class="blade-intro">
+          <h2 id="blade-title">The blade between breaths.</h2>
+          <p>
+            Seven forms hang in the mist ahead. Scroll to fly through them, drag the blade to turn it,
+            and press <kbd>R</kbd> to come back to the start.
           </p>
         </div>
 
-        <div class="form-panels" data-reveal>
-          <button class="form-panel" type="button" data-form-index="0" aria-label="Explore First Form: Low Clouds, Distant Haze">
-            <img src="/images/bright-action.webp" alt="Muichiro drawing his blade through pale mist" loading="lazy" />
-            <span class="form-panel__number">I</span>
-            <span class="form-panel__caption"><small>FIRST FORM</small><strong>LOW CLOUDS,<br />DISTANT HAZE</strong><i>Explore <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></i></span>
-          </button>
-          <button class="form-panel" type="button" data-form-index="4" aria-label="Explore Fifth Form: Sea of Clouds and Haze">
-            <img src="/images/action-mist.webp" alt="Muichiro turning through a dynamic sword strike" loading="lazy" />
-            <span class="form-panel__number">V</span>
-            <span class="form-panel__caption"><small>FIFTH FORM</small><strong>SEA OF CLOUDS<br />AND HAZE</strong><i>Explore <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></i></span>
-          </button>
-          <button class="form-panel" type="button" data-form-index="6" aria-label="Explore Seventh Form: Obscuring Clouds">
-            <img src="/images/portrait.webp" alt="Muichiro facing forward behind his sword" loading="lazy" />
-            <span class="form-panel__number">VII</span>
-            <span class="form-panel__caption"><small>SEVENTH FORM</small><strong>OBSCURING<br />CLOUDS</strong><i>Explore <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></i></span>
-          </button>
-        </div>
+        <div class="blade-stage">
+          <canvas
+            id="blade-canvas"
+            tabindex="0"
+            aria-label="Three-dimensional fly-through of the seven forms of Mist Breathing"
+            aria-describedby="blade-hint"
+          ></canvas>
 
-        <div class="form-index-wrap" data-reveal>
-          <p class="eyebrow">Complete technique index <span>Select to open</span></p>
-          <ol class="form-index" id="form-index"></ol>
-        </div>
-      </section>
+          <ol class="blade-beats" id="blade-beats">
+            <li class="blade-beat is-current">
+              <span lang="ja" aria-hidden="true">壱</span>
+              <p>A stance that costs nothing.</p>
+            </li>
+            <li class="blade-beat">
+              <span lang="ja" aria-hidden="true">伍</span>
+              <p>Five forms of falling cloud.</p>
+            </li>
+            <li class="blade-beat">
+              <span lang="ja" aria-hidden="true">漆</span>
+              <p>Then the tempo breaks.</p>
+            </li>
+          </ol>
 
-      <section class="mist-3d" id="mist-3d" aria-labelledby="mist-3d-title">
-        <div class="mist-3d__sticky">
-          <span class="mist-3d__ghost" aria-hidden="true">朧</span>
-          <div class="mist-3d__copy" data-reveal>
-            <p class="eyebrow"><span>03 / SEVENTH FORM IN 3D</span> A study in tempo</p>
-            <h2 id="mist-3d-title">THE BLADE<br /><em>BETWEEN</em><br />BREATHS.</h2>
-            <p class="mist-3d__body">
-              Obscuring Clouds is a change of rhythm made visible. Orbit the blade,
-              follow its light through the mist, and scroll to shift your point of view.
-            </p>
-            <div class="mist-3d__actions">
-              <button class="text-button" id="mist-motion" type="button" aria-pressed="false">Pause motion</button>
-              <button class="text-button" id="mist-reset" type="button">Reset view</button>
-            </div>
+          <div class="blade-hud">
+            <p id="blade-hint">Scroll to fly · drag the blade · <kbd>R</kbd> to reset</p>
+            <button class="link-button" id="blade-motion" type="button" aria-pressed="false">Pause motion</button>
           </div>
 
-          <div class="mist-3d__stage" id="mist-3d-stage" data-reveal>
-            <canvas
-              id="mist-3d-canvas"
-              tabindex="0"
-              aria-label="Interactive three-dimensional Nichirin sword"
-              aria-describedby="mist-3d-instructions"
-            ></canvas>
-            <div class="mist-3d__loading" id="mist-3d-loading" role="status"><span></span> Forging the seventh form</div>
-            <img class="mist-3d__fallback" id="mist-3d-fallback" src="/images/action-mist.webp" alt="Muichiro moving through a mist-filled sword strike" loading="lazy" hidden />
-            <span class="mist-3d__corner mist-3d__corner--top" aria-hidden="true">REAL-TIME / WEBGL</span>
-            <span class="mist-3d__corner mist-3d__corner--side" aria-hidden="true">NICHIRIN / 07</span>
+          <div class="blade-rest" id="blade-rest" hidden>
+            <p class="blade-rest__note">The seven forms, held still.</p>
+            <ol class="blade-rest__grid" id="blade-rest-grid"></ol>
           </div>
 
-          <div class="mist-3d__hud">
-            <p id="mist-3d-instructions">Drag to rotate <span>·</span> Arrow keys when focused <span>·</span> Scroll to transform</p>
-            <div class="mist-3d__meter" aria-hidden="true"><span id="mist-3d-progress"></span></div>
-            <span>OBORO / 朧</span>
-          </div>
+          <p class="sr-only" id="blade-status" role="status"></p>
         </div>
       </section>
 
-      <section class="impact-scene" id="impact" aria-labelledby="impact-title">
-        <div class="impact-media" aria-hidden="true"><img src="/images/impact.webp" alt="" loading="lazy" /></div>
-        <div class="impact-color" aria-hidden="true"></div>
-        <div class="impact-flash" aria-hidden="true"></div>
-        <div class="impact-slash" aria-hidden="true"></div>
-        <div class="impact-content">
-          <p class="eyebrow" data-reveal><span>04 / IMPACT FRAME</span> Muichiro's own creation</p>
-          <h2 id="impact-title" data-reveal><span>OBSCURING</span><em>CLOUDS</em></h2>
-          <div class="impact-bottom" data-reveal>
-            <p>Slow enough to be seen.<br /><strong>Fast enough to disappear.</strong></p>
-            <button class="button button--light" id="strike-button" type="button">Strike the frame <svg class="ui-icon ui-icon--bolt" aria-hidden="true"><use href="#icon-bolt" /></svg></button>
-          </div>
+      <!-- 4. OBSCURING CLOUDS: one full-bleed frame, one card, one live strike. -->
+      <section class="impact" id="impact" aria-labelledby="impact-title">
+        <div class="impact__media" aria-hidden="true">
+          <img src="/images/impact.webp" width="768" height="432" alt="" loading="lazy" />
         </div>
-        <span class="impact-number" aria-hidden="true">07</span>
+        <div class="impact__card">
+          <h2 id="impact-title">Obscuring Clouds</h2>
+          <p class="impact__form"><span lang="ja">漆ノ型 朧</span> · the seventh form</p>
+          <p>
+            Muichiro slows his tempo until he seems to stand still, then accelerates so abruptly that
+            the eye keeps watching the place he has left.
+          </p>
+          <button class="button button--solid" id="strike-button" type="button">
+            Strike the frame
+            <svg class="ui-icon ui-icon--bolt" aria-hidden="true"><use href="#icon-bolt" /></svg>
+          </button>
+        </div>
         <p class="sr-only" id="impact-status" aria-live="polite"></p>
+        <div class="impact__flash" aria-hidden="true"></div>
       </section>
 
-      <section class="outro" id="legacy" aria-labelledby="outro-title">
-        <div class="outro__copy">
-          <p class="eyebrow" data-reveal><span>05 / AFTER THE ACTION</span> What remains</p>
-          <h2 id="outro-title" data-reveal>EVEN MIST<br />REMEMBERS<br /><em>THE SKY.</em></h2>
-          <p class="outro__body" data-reveal>
-            Behind Muichiro's distant gaze is a story of memory, loss, and fierce protection.
-            The stillness is never emptiness—it is the space before he moves for someone else.
+      <!-- 5. MEMORY: what the stillness is made of. -->
+      <section class="memory" id="memory" aria-labelledby="memory-title">
+        <div class="memory__lede" data-reveal>
+          <h2 id="memory-title">Even mist remembers the sky.</h2>
+          <p>
+            His twin brother Yuichiro died the night their house was attacked, and Muichiro carried
+            almost nothing of that night with him. He was a Hashira within two months of taking up the
+            blade. What looks like distance in him is a boy who lost the person who remembered for him.
           </p>
-          <dl class="outro__stats" data-reveal>
-            <div><dt>Age</dt><dd>14</dd></div>
-            <div><dt>Rank</dt><dd>HASHIRA</dd></div>
-            <div><dt>Signature</dt><dd>OBORO</dd></div>
-          </dl>
-          <button class="text-button text-button--dark" type="button" data-open-reel data-reveal>
-            Watch the visual edit <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg>
-          </button>
         </div>
-        <div class="outro__image" data-reveal>
-          <img src="/images/quiet.webp" alt="Muichiro standing quietly in a mist-covered forest" loading="lazy" />
-          <span aria-hidden="true">時透無一郎</span>
+
+        <div class="memory__record" data-reveal>
+          <dl class="memory__list">
+            <div><dt>Name</dt><dd>Muichiro Tokitō <span lang="ja">時透 無一郎</span></dd></div>
+            <div><dt>Age</dt><dd>Fourteen</dd></div>
+            <div><dt>Breathing</dt><dd>Mist, derived from Wind</dd></div>
+            <div><dt>Nickname</dt><dd>The Mist Hashira <span lang="ja">霞柱</span></dd></div>
+            <div><dt>Blade</dt><dd>Nichirin, pale as fog</dd></div>
+            <div><dt>Own technique</dt><dd>Form seven, <span lang="ja">朧</span></dd></div>
+            <div><dt>Family</dt><dd>Yuichiro, twin brother</dd></div>
+            <div><dt>Last stand</dt><dd>The Infinity Castle</dd></div>
+          </dl>
+          <figure class="memory__figure">
+            <img src="/images/close.webp" width="600" height="375" alt="A close crop of Muichiro's face and sword guard." loading="lazy" />
+            <figcaption>He forgot the year, not the promise.</figcaption>
+          </figure>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="site-footer__top">
-        <a class="brand brand--footer" href="#top"><span class="brand__mark" aria-hidden="true">霞</span><span>INTO THE MIST</span></a>
-        <p>A fan-made character study in motion and stillness.</p>
-        <a class="back-to-top" href="#top">Back to top <svg class="ui-icon" aria-hidden="true"><use href="#icon-up" /></svg></a>
+    <footer class="site-footer" id="colophon">
+      <div class="site-footer__picture" aria-hidden="true">
+        <img src="/images/leaves.webp" width="600" height="375" alt="" loading="lazy" />
       </div>
-      <div class="site-footer__bottom">
-        <p>Demon Slayer: Kimetsu no Yaiba © Koyoharu Gotouge / SHUEISHA, Aniplex, ufotable.</p>
-        <button class="text-button" id="open-credits" type="button">Image credits <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></button>
+      <div class="site-footer__menu" data-reveal>
+        <a class="wordmark wordmark--footer" href="#top">
+          <span class="wordmark__kanji" lang="ja" aria-hidden="true">霞</span>
+          <span class="wordmark__text">Into the Mist</span>
+        </a>
+        <nav aria-label="Footer">
+          <a href="#top">The title</a>
+          <a href="#forms">Seven forms</a>
+          <a href="#blade">The blade</a>
+          <a href="#impact">Obscuring Clouds</a>
+          <a href="#memory">Memory</a>
+        </nav>
+        <div class="site-footer__blocks">
+          <div>
+            <p>Fan-made study. No commercial use.</p>
+            <button class="link-button" id="open-credits" type="button">Image credits</button>
+          </div>
+          <div>
+            <p>Built with Vite, Three.js and local artwork.</p>
+            <button class="link-button" type="button" data-open-reel>Watch the 16-second edit</button>
+          </div>
+        </div>
+        <p class="site-footer__legal">
+          Demon Slayer: Kimetsu no Yaiba © Koyoharu Gotouge / SHUEISHA, Aniplex, ufotable. Artwork
+          belongs to its respective creators and rights holders.
+        </p>
       </div>
-      <span class="site-footer__ghost" aria-hidden="true">MIST</span>
     </footer>
 
-    <dialog class="reel-dialog" id="reel-dialog" aria-label="Muichiro 16-second visual edit">
+    <dialog class="reel-dialog" id="reel-dialog" aria-label="Muichiro, a sixteen second visual edit">
       <div class="reel-shell">
         <header class="reel-header">
-          <div><span class="brand__mark" aria-hidden="true">霞</span><p>MUICHIRO / 16 SECOND EDIT<small>VISUAL CUT · 08 SCENES</small></p></div>
-          <button class="icon-button" id="close-reel" type="button" aria-label="Close visual edit">×</button>
+          <div>
+            <span class="wordmark__kanji" aria-hidden="true">霞</span>
+            <p>MUICHIRO / 16 SECOND EDIT<small>VISUAL CUT · 08 SCENES</small></p>
+          </div>
+          <button class="icon-button" id="close-reel" type="button" aria-label="Close the visual edit">×</button>
         </header>
         <div class="reel-stage" id="reel-stage">
           <section class="reel-scene reel-scene--one" data-start="0" data-end="1800" aria-label="Scene 1: The quiet blade">
@@ -296,9 +300,9 @@
           </section>
           <section class="reel-scene reel-scene--six" data-start="10200" data-end="12400" aria-label="Scene 6: Three-panel action cut">
             <div class="reel-triptych">
-              <div><img src="/images/action-mist.webp" alt="" /><span>I</span></div>
-              <div><img src="/images/bright-action.webp" alt="" /><span>V</span></div>
-              <div><img src="/images/portrait.webp" alt="" /><span>VII</span></div>
+              <div><img src="/images/action-mist.webp" alt="" /><span>壱</span></div>
+              <div><img src="/images/bright-action.webp" alt="" /><span>伍</span></div>
+              <div><img src="/images/portrait.webp" alt="" /><span>漆</span></div>
             </div>
             <p class="reel-kicker">SEVEN FORMS / ONE INSTANT</p>
           </section>
@@ -314,8 +318,8 @@
           </section>
         </div>
         <footer class="reel-controls">
-          <button class="icon-button" id="reel-toggle" type="button" aria-label="Pause visual edit"><svg class="ui-icon" aria-hidden="true"><use href="#icon-pause" /></svg></button>
-          <button class="icon-button" id="reel-restart" type="button" aria-label="Restart visual edit"><svg class="ui-icon" aria-hidden="true"><use href="#icon-restart" /></svg></button>
+          <button class="icon-button" id="reel-toggle" type="button" aria-label="Pause the visual edit"><svg class="ui-icon" aria-hidden="true"><use href="#icon-pause" /></svg></button>
+          <button class="icon-button" id="reel-restart" type="button" aria-label="Restart the visual edit"><svg class="ui-icon" aria-hidden="true"><use href="#icon-restart" /></svg></button>
           <div class="reel-progress" aria-hidden="true"><span id="reel-progress-bar"></span></div>
           <output id="reel-time" aria-live="off">00:00 / 00:16</output>
           <span class="reel-hint">SPACE TO PAUSE · ESC TO CLOSE</span>
@@ -324,27 +328,25 @@
     </dialog>
 
     <dialog class="form-dialog" id="form-dialog" aria-labelledby="form-dialog-title">
-      <button class="icon-button dialog-close" id="close-form" type="button" aria-label="Close technique details">×</button>
-      <div class="form-dialog__image"><img id="form-dialog-image" src="/images/bright-action.webp" alt="" /></div>
+      <button class="icon-button dialog-close" id="close-form" type="button" aria-label="Close the technique details">×</button>
+      <div class="form-dialog__image"><img id="form-dialog-image" src="/images/bright-action.webp" alt="" width="768" height="432" /></div>
       <div class="form-dialog__content">
-        <p class="eyebrow" id="form-dialog-kicker">MIST BREATHING / FIRST FORM</p>
-        <span class="form-dialog__number" id="form-dialog-number" aria-hidden="true">I</span>
+        <p class="form-dialog__kicker" id="form-dialog-kicker">Mist Breathing, first form</p>
         <p class="form-dialog__jp" id="form-dialog-jp" lang="ja">壱ノ型　垂天遠霞</p>
-        <h2 id="form-dialog-title">LOW CLOUDS,<br />DISTANT HAZE</h2>
+        <h2 id="form-dialog-title">Low Clouds, Distant Haze</h2>
         <p id="form-dialog-description"></p>
         <div class="form-dialog__controls">
-          <button class="text-button text-button--dark" id="previous-form" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-left" /></svg> Previous</button>
-          <span id="form-dialog-count">01 / 07</span>
-          <button class="text-button text-button--dark" id="next-form" type="button">Next <svg class="ui-icon" aria-hidden="true"><use href="#icon-right" /></svg></button>
+          <button class="link-button" id="previous-form" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-left" /></svg> Previous</button>
+          <span id="form-dialog-count">form 1 of 7</span>
+          <button class="link-button" id="next-form" type="button">Next <svg class="ui-icon" aria-hidden="true"><use href="#icon-right" /></svg></button>
         </div>
       </div>
     </dialog>
 
     <dialog class="credits-dialog" id="credits-dialog" aria-labelledby="credits-title">
-      <button class="icon-button dialog-close" id="close-credits" type="button" aria-label="Close image credits">×</button>
-      <p class="eyebrow">LOCAL ASSETS / SOURCE LINKS</p>
-      <h2 id="credits-title">IMAGE CREDITS</h2>
-      <p>Artwork belongs to its respective creators and rights holders. Source pages are provided below.</p>
+      <button class="icon-button dialog-close" id="close-credits" type="button" aria-label="Close the image credits">×</button>
+      <h2 id="credits-title">Image credits</h2>
+      <p>Artwork belongs to its respective creators and rights holders. Source pages:</p>
       <ul>
         <li><a href="https://swordslice.com/blogs/news/the-art-of-the-mist-muichiro-s-sword-and-fighting-style" target="_blank" rel="noreferrer">SwordSlice — hero artwork <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></a></li>
         <li><a href="https://geekozi.com/demon-slayer-posters/muichiro-tokito-posters" target="_blank" rel="noreferrer">Geekozi — portrait and action artwork <svg class="ui-icon" aria-hidden="true"><use href="#icon-up-right" /></svg></a></li>
