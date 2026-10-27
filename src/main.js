@@ -1,7 +1,9 @@
 import '@fontsource/hanken-grotesk/latin-400.css';
 import '@fontsource/hanken-grotesk/latin-500.css';
 import '@fontsource/hanken-grotesk/latin-700.css';
-import '@fontsource/hanken-grotesk/latin-600.css';
+import '@fontsource/jetbrains-mono/latin-400.css';
+import '@fontsource/jetbrains-mono/latin-500.css';
+import '@fontsource/jetbrains-mono/latin-700.css';
 import './jp-font.css';
 import './styles.css';
 
@@ -10,7 +12,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 /* ---------------------------------------------------------------------------
    The seven forms — one source of truth for the index, the dialog, the
-   fly-through cards and the still fallback.
+   fly-through plates and the still fallback.
    ------------------------------------------------------------------------ */
 const forms = [
   {
@@ -23,8 +25,8 @@ const forms = [
     gloss: 'One direct thrust. He closes the distance and makes a single point of contact.',
     description:
       'A direct, powerful frontal thrust. The movement is economical: close the distance at speed and make one precise point of contact.',
-    image: '/images/bright-action.webp',
-    position: '50% 40%',
+    image: '/images/anime-slash.jpg',
+    position: '50% 45%',
   },
   {
     kanji: '弐',
@@ -36,8 +38,8 @@ const forms = [
     gloss: 'Eight cuts stacked one over another, each leaving less room to answer.',
     description:
       'Eight slashes arrive in rapid succession, layered one over another. The rhythm is the weapon — each cut leaves less room for an answer.',
-    image: '/images/action-mist.webp',
-    position: '50% 30%',
+    image: '/images/anime-impact.jpg',
+    position: '50% 50%',
   },
   {
     kanji: '参',
@@ -49,8 +51,8 @@ const forms = [
     gloss: 'A circle cut in one breath, wide enough to turn projectiles aside.',
     description:
       'A swift circular slash clears the space around the swordsman and can deflect incoming projectiles like mist breaking apart.',
-    image: '/images/leaves.webp',
-    position: '50% 50%',
+    image: '/images/anime-valley.jpg',
+    position: '50% 60%',
   },
   {
     kanji: '肆',
@@ -62,8 +64,8 @@ const forms = [
     gloss: 'From a low stance he flows into a dash, then into the cut.',
     description:
       'From a low stance, the swordsman flows into a sudden dash and slash. Stillness and acceleration share a single breath.',
-    image: '/images/hero.webp',
-    position: '52% 45%',
+    image: '/images/anime-slash.jpg',
+    position: '30% 55%',
   },
   {
     kanji: '伍',
@@ -75,8 +77,8 @@ const forms = [
     gloss: 'A zig-zag charge becomes a barrage, covering ground like cloud.',
     description:
       'A blistering zig-zag charge becomes a continuous barrage of slashes, covering a wide area like clouds closing over a landscape.',
-    image: '/images/action-mist.webp',
-    position: '50% 40%',
+    image: '/images/anime-valley.jpg',
+    position: '50% 78%',
   },
   {
     kanji: '陸',
@@ -88,8 +90,8 @@ const forms = [
     gloss: 'A somersault of cuts, ending on one decisive vertical line.',
     description:
       'An airborne sequence of slashes unfolds around a somersault, ending in a decisive vertical cut through the mist.',
-    image: '/images/bright-action.webp',
-    position: '50% 30%',
+    image: '/images/anime-close.jpg',
+    position: '50% 40%',
   },
   {
     kanji: '漆',
@@ -101,31 +103,120 @@ const forms = [
     gloss: 'His own form: tempo broken on purpose, until the eye loses him.',
     description:
       'Muichiro’s own creation. He fluctuates his tempo — appearing almost still, then accelerating so abruptly that he seems to vanish into a cloud of mist.',
-    image: '/images/portrait.webp',
-    position: '50% 26%',
+    image: '/images/anime-hero.jpg',
+    position: '50% 30%',
   },
 ];
 
 /* ---------------------------------------------------------------------------
-   Frame: progress, header tone, reveals, navigation
+   Preloader: a counting slate that clears like fog.
+   ------------------------------------------------------------------------ */
+const preloader = document.querySelector('#preloader');
+const preloaderCount = document.querySelector('#preloader-count');
+const preloaderBar = document.querySelector('#preloader-bar');
+
+function runPreloader() {
+  if (!preloader) return Promise.resolve();
+  document.body.classList.add('is-loading');
+  return new Promise((resolve) => {
+    if (reduceMotion) {
+      preloader.classList.add('is-done');
+      document.body.classList.remove('is-loading');
+      resolve();
+      return;
+    }
+    const start = performance.now();
+    const duration = 1100;
+    function tick(now) {
+      const t = clamp((now - start) / duration);
+      const value = Math.round(t * 100);
+      if (preloaderCount) preloaderCount.textContent = String(value).padStart(3, '0');
+      if (preloaderBar) preloaderBar.style.transform = `scaleX(${t})`;
+      if (t < 1) requestAnimationFrame(tick);
+      else {
+        preloader.classList.add('is-done');
+        document.body.classList.remove('is-loading');
+        resolve();
+      }
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ---------------------------------------------------------------------------
+   Word-by-word blur-in: split every [data-words] into .w spans.
+   ------------------------------------------------------------------------ */
+function splitWords(root) {
+  const nodes = [...root.childNodes];
+  let delay = 0;
+  nodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const words = node.textContent.split(/(\s+)/);
+      const fragment = document.createDocumentFragment();
+      words.forEach((word) => {
+        if (!word.trim()) {
+          fragment.append(word);
+          return;
+        }
+        const span = document.createElement('span');
+        span.className = 'w';
+        span.style.transitionDelay = `${delay * 55}ms`;
+        span.textContent = word;
+        delay += 1;
+        fragment.append(span);
+      });
+      root.replaceChild(fragment, node);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const wrap = document.createElement('span');
+      wrap.className = 'w';
+      wrap.style.transitionDelay = `${delay * 55}ms`;
+      delay += 1;
+      node.parentNode.insertBefore(wrap, node);
+      wrap.append(node);
+    }
+  });
+}
+
+document.querySelectorAll('[data-words]').forEach(splitWords);
+
+const wordObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-lit');
+        wordObserver.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.35 },
+);
+document.querySelectorAll('[data-words]').forEach((element) => wordObserver.observe(element));
+
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.2 },
+);
+document.querySelectorAll('[data-reveal]').forEach((element) => revealObserver.observe(element));
+
+/* ---------------------------------------------------------------------------
+   Frame: page progress + current section in the nav + header timecode
    ------------------------------------------------------------------------ */
 const header = document.querySelector('#site-header');
 const pageProgress = document.querySelector('#page-progress-bar');
-const darkSections = ['#blade', '#impact', '#colophon']
-  .map((selector) => document.querySelector(selector))
-  .filter(Boolean);
+const headerTimecode = document.querySelector('#header-timecode');
 const navLinks = [...document.querySelectorAll('.main-nav a')];
+const navSections = navLinks
+  .map((link) => document.querySelector(link.getAttribute('href')))
+  .filter(Boolean);
 
 let pageFrame = 0;
-
-function updateHeaderTone() {
-  const line = header ? header.getBoundingClientRect().bottom - 8 : 64;
-  const onDark = darkSections.some((section) => {
-    const rect = section.getBoundingClientRect();
-    return rect.top <= line && rect.bottom >= line;
-  });
-  header?.setAttribute('data-on-dark', String(onDark));
-}
 
 function updatePage() {
   pageFrame = 0;
@@ -133,42 +224,138 @@ function updatePage() {
   const range = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
   if (pageProgress) pageProgress.style.transform = `scaleX(${clamp(scrollTop / range).toFixed(4)})`;
   header?.classList.toggle('is-scrolled', scrollTop > 24);
-  updateHeaderTone();
-  updateHero();
-  updateBeats();
+
+  const line = header ? header.getBoundingClientRect().bottom + 40 : 80;
+  let current = null;
+  navSections.forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top <= line && rect.bottom >= line) current = section.id;
+  });
+  navLinks.forEach((link) =>
+    link.classList.toggle('is-current', link.getAttribute('href') === `#${current}`),
+  );
 }
 
 function requestPageUpdate() {
   if (!pageFrame) pageFrame = requestAnimationFrame(updatePage);
 }
 
+window.addEventListener('scroll', requestPageUpdate, { passive: true });
+window.addEventListener('resize', requestPageUpdate);
+requestPageUpdate();
+
 /* ---------------------------------------------------------------------------
-   1. The pinned hero: the name holds still, his portraits and the ground
-   colour change beneath it.
+   The story: one scrubbed cel-shaded timeline, film headlines and telemetry
+   pinned to 3D anchors. Falls back to a held still without motion or WebGL.
    ------------------------------------------------------------------------ */
-const heroRun = document.querySelector('#hero-run');
-const heroField = document.querySelector('#hero-field');
-const heroTitle = document.querySelector('#hero-title');
-const heroPortraits = [...document.querySelectorAll('.hero-portrait')];
-let heroIndex = -1;
+const storySection = document.querySelector('#story');
+const storyStage = document.querySelector('#story-stage');
+const storyCanvas = document.querySelector('#blade-canvas');
+const storyHeadlines = document.querySelector('#story-headlines');
+const storyRail = document.querySelector('#story-rail-bar');
+const storyBeat = document.querySelector('#story-beat');
+const storyRest = document.querySelector('#blade-rest');
+const storyRestGrid = document.querySelector('#blade-rest-grid');
+const bladeStatus = document.querySelector('#blade-status');
+const telTip = document.querySelector('#tel-tip');
+const telMist = document.querySelector('#tel-mist');
+const telGuard = document.querySelector('#tel-guard');
+const telTipRead = document.querySelector('#tel-tip-read');
+const telMistRead = document.querySelector('#tel-mist-read');
+const telGuardRead = document.querySelector('#tel-guard-read');
 
-function updateHero() {
-  if (!heroRun || heroPortraits.length === 0) return;
-  const rect = heroRun.getBoundingClientRect();
-  const index = clamp(Math.round(-rect.top / window.innerHeight), 0, heroPortraits.length - 1);
-  if (index === heroIndex) return;
-  heroIndex = index;
-  const portrait = heroPortraits[index];
-  if (heroField) heroField.style.backgroundColor = portrait.dataset.field || '';
-  heroPortraits.forEach((item, itemIndex) => item.classList.toggle('is-current', itemIndex === index));
+if (storyHeadlines) {
+  storyHeadlines.innerHTML = forms
+    .map(
+      (form) => `
+      <li>
+        <span class="kanji" lang="ja" aria-hidden="true">${form.kanji}</span>
+        <h3>${form.title}</h3>
+        <p class="gloss">${form.gloss}</p>
+      </li>`,
+    )
+    .join('');
 }
 
-if (heroTitle) {
-  requestAnimationFrame(() => requestAnimationFrame(() => heroTitle.classList.add('is-in')));
+if (storyRestGrid) {
+  storyRestGrid.innerHTML = forms
+    .map(
+      (form) => `
+      <li>
+        <img src="${form.image}" width="768" height="432" alt="" loading="lazy" />
+        <b lang="ja">${form.kanji}</b>
+        <span>${form.title}</span>
+      </li>`,
+    )
+    .join('');
+}
+
+let activeBeat = -1;
+
+function setBeat(index) {
+  if (index === activeBeat) return;
+  activeBeat = index;
+  if (storyBeat) storyBeat.textContent = `FORM ${String(index + 1).padStart(2, '0')} / 07`;
+  storyHeadlines
+    ?.querySelectorAll('li')
+    .forEach((item, itemIndex) => item.classList.toggle('is-active', itemIndex === index));
+}
+
+function showStoryRest(message) {
+  storyStage?.classList.add('is-rest');
+  storyRest?.removeAttribute('hidden');
+  storyCanvas?.setAttribute('hidden', '');
+  document.querySelector('.story-overlay')?.setAttribute('hidden', '');
+  if (bladeStatus && message) bladeStatus.textContent = message;
+}
+
+function placeTelemetry(box, anchor) {
+  if (!box || !anchor) return;
+  box.classList.toggle('is-off', !anchor.visible);
+  if (anchor.visible) {
+    const dx = Number(box.dataset.dx ?? 28);
+    const dy = Number(box.dataset.dy ?? 0);
+    box.style.transform = `translate3d(${anchor.x + dx}px, ${anchor.y + dy}px, 0) translateY(-50%)`;
+  }
+}
+
+async function startStory() {
+  if (reduceMotion) {
+    showStoryRest('Motion is reduced, so the seven forms are held still instead of flown.');
+    setBeat(0);
+    return;
+  }
+  try {
+    const { createAnimeScene } = await import('./anime-scene.js');
+    await createAnimeScene({
+      canvas: storyCanvas,
+      section: storySection,
+      stage: storyStage,
+      motionButton: document.querySelector('#blade-motion'),
+      status: bladeStatus,
+      forms,
+      onFrame({ progress, beat, anchors, telemetry }) {
+        setBeat(beat);
+        if (storyRail) storyRail.style.transform = `scaleX(${progress.toFixed(4)})`;
+        if (headerTimecode) headerTimecode.textContent = telemetry.timecode;
+        placeTelemetry(telTip, anchors.tip);
+        placeTelemetry(telMist, anchors.mist);
+        placeTelemetry(telGuard, anchors.guard);
+        if (telTipRead) telTipRead.textContent = `${telemetry.altitude} M · ${telemetry.heading}°`;
+        if (telMistRead) telMistRead.textContent = `${telemetry.density} MG/M³`;
+        if (telGuardRead) telGuardRead.textContent = `${telemetry.timecode} / 00:16`;
+      },
+    });
+    setBeat(0);
+  } catch (error) {
+    console.error('The anime scene could not start.', error);
+    showStoryRest('This browser cannot run the 3D scene, so the seven forms are held still.');
+    setBeat(0);
+  }
 }
 
 /* ---------------------------------------------------------------------------
-   2. The seven forms: the photograph holds, the index moves.
+   The seven forms index: a held cel on the left, the list on the right.
    ------------------------------------------------------------------------ */
 const formList = document.querySelector('#form-list');
 const formsFrame = document.querySelector('.forms__frame');
@@ -220,14 +407,13 @@ function setActiveForm(index) {
     formsImage.dataset.index = String(next);
     if (formsCaption) formsCaption.textContent = `${form.kanji} — ${form.gloss}`;
     formsFrame?.classList.remove('is-swapping');
-  }, 180);
+  }, 160);
 }
 
 formList?.addEventListener('pointerover', (event) => {
   const button = event.target.closest('[data-form-index]');
   if (button) setActiveForm(Number(button.dataset.formIndex));
 });
-
 formList?.addEventListener('focusin', (event) => {
   const button = event.target.closest('[data-form-index]');
   if (button) setActiveForm(Number(button.dataset.formIndex));
@@ -237,9 +423,9 @@ function updateFormDialog(index) {
   activeForm = (index + forms.length) % forms.length;
   const form = forms[activeForm];
   dialogImage.src = form.image;
-  dialogImage.alt = `Muichiro artwork accompanying ${form.title}.`;
+  dialogImage.alt = `Original anime-style cel accompanying ${form.title}.`;
   dialogImage.style.objectPosition = form.position;
-  dialogKicker.textContent = `Mist Breathing, ${form.ordinal.toLowerCase()}`;
+  dialogKicker.textContent = `MIST BREATHING, ${form.ordinal.toUpperCase()}`;
   dialogJp.textContent = form.jpLong;
   dialogTitle.textContent = form.title;
   dialogDescription.textContent = form.description;
@@ -252,277 +438,34 @@ document.addEventListener('click', (event) => {
   updateFormDialog(Number(button.dataset.formIndex));
   if (formDialog && !formDialog.open) formDialog.showModal();
 });
-
 document.querySelector('#previous-form')?.addEventListener('click', () => updateFormDialog(activeForm - 1));
 document.querySelector('#next-form')?.addEventListener('click', () => updateFormDialog(activeForm + 1));
 document.querySelector('#close-form')?.addEventListener('click', () => formDialog?.close());
 
 /* ---------------------------------------------------------------------------
-   3. The blade: a scroll-driven fly-through, with a designed still version
-   for reduced motion, no WebGL or a failed script.
+   Obscuring Clouds: strike the frame.
    ------------------------------------------------------------------------ */
-const bladeSection = document.querySelector('#blade');
-const bladeStage = document.querySelector('.blade-stage');
-const bladeCanvas = document.querySelector('#blade-canvas');
-const bladeRest = document.querySelector('#blade-rest');
-const bladeRestGrid = document.querySelector('#blade-rest-grid');
-const bladeBeats = [...document.querySelectorAll('.blade-beat')];
-const bladeStatus = document.querySelector('#blade-status');
-let bladeScene = null;
-let bladeRequested = false;
-
-if (bladeRestGrid) {
-  bladeRestGrid.innerHTML = forms
-    .map(
-      (form) => `
-      <li>
-        <img src="${form.image}" width="768" height="432" alt="" loading="lazy" />
-        <b lang="ja">${form.kanji}</b>
-        <span>${form.title}</span>
-      </li>`,
-    )
-    .join('');
-}
-
-function showBladeRest(message) {
-  bladeSection?.classList.add('is-rest');
-  bladeRest?.removeAttribute('hidden');
-  bladeCanvas?.setAttribute('hidden', '');
-  document.querySelector('.blade-beats')?.setAttribute('hidden', '');
-  document.querySelector('.blade-hud p')?.setAttribute('hidden', '');
-  const motionButton = document.querySelector('#blade-motion');
-  if (motionButton) motionButton.hidden = true;
-  if (bladeStatus && message) bladeStatus.textContent = message;
-}
-
-function updateBeats() {
-  if (!bladeSection || bladeSection.classList.contains('is-rest') || bladeBeats.length === 0) return;
-  const rect = bladeSection.getBoundingClientRect();
-  const range = Math.max(1, bladeSection.offsetHeight - window.innerHeight);
-  const progress = clamp(-rect.top / range, 0, 1);
-  const index = progress < 0.24 ? 0 : progress < 0.62 ? 1 : 2;
-  bladeBeats.forEach((beat, beatIndex) => beat.classList.toggle('is-current', beatIndex === index));
-}
-
-async function loadBladeScene() {
-  if (bladeRequested || !bladeCanvas) return;
-  bladeRequested = true;
-  try {
-    const { createBladeScene } = await import('./fly-scene.js');
-    bladeScene = await createBladeScene({
-      canvas: bladeCanvas,
-      section: bladeSection,
-      stage: bladeStage,
-      motionButton: document.querySelector('#blade-motion'),
-      status: bladeStatus,
-      forms,
-      reducedMotion: reduceMotion,
-    });
-    bladeStage?.classList.add('is-live');
-  } catch (error) {
-    console.error('The three-dimensional blade could not start.', error);
-    showBladeRest('The three-dimensional view is unavailable; the seven forms are shown held still.');
-  }
-}
-
-if (bladeSection) {
-  if (reduceMotion) {
-    showBladeRest('The seven forms are shown held still.');
-  } else if ('IntersectionObserver' in window) {
-    const loader = new IntersectionObserver((entries, observer) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      loadBladeScene();
-    }, { rootMargin: '120% 0px' });
-    loader.observe(bladeSection);
-  } else {
-    loadBladeScene();
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   4. Obscuring Clouds: the impact frame, struck by hand
-   ------------------------------------------------------------------------ */
-const impact = document.querySelector('#impact');
+const strikeButton = document.querySelector('#strike-button');
+const impactFlash = document.querySelector('.impact__flash');
 const impactStatus = document.querySelector('#impact-status');
-let impactTimer = 0;
 
-document.querySelector('#strike-button')?.addEventListener('click', () => {
-  window.clearTimeout(impactTimer);
-  impact.classList.remove('is-striking');
-  void impact.offsetWidth;
-  impact.classList.add('is-striking');
-  if (impactStatus) impactStatus.textContent = 'Impact frame struck.';
-  impactTimer = window.setTimeout(() => impact.classList.remove('is-striking'), 700);
+strikeButton?.addEventListener('click', () => {
+  impactFlash?.classList.remove('is-on');
+  void impactFlash?.offsetWidth;
+  impactFlash?.classList.add('is-on');
+  if (impactStatus) impactStatus.textContent = 'Obscuring Clouds: the tempo breaks and he is gone.';
 });
 
 /* ---------------------------------------------------------------------------
-   The 16-second edit, replayed in a dialog
+   Credits dialog.
    ------------------------------------------------------------------------ */
-const reelDialog = document.querySelector('#reel-dialog');
-const reelStage = document.querySelector('#reel-stage');
-const reelToggle = document.querySelector('#reel-toggle');
-const reelProgress = document.querySelector('#reel-progress-bar');
-const reelTime = document.querySelector('#reel-time');
-const reelScenes = [...document.querySelectorAll('.reel-scene')].map((element) => ({
-  element,
-  start: Number(element.dataset.start),
-  end: Number(element.dataset.end),
-}));
-const reelDuration = 16000;
-let reelElapsed = 0;
-let reelStartedAt = 0;
-let reelFrame = 0;
-let reelPlaying = false;
-
-if (reelStage) reelStage.tabIndex = -1;
-
-function setReelState() {
-  reelDialog?.classList.toggle('is-paused', !reelPlaying);
-  if (!reelToggle) return;
-  const icon = reelPlaying ? 'pause' : 'play';
-  reelToggle.innerHTML = `<svg class="ui-icon" aria-hidden="true"><use href="#icon-${icon}" /></svg>`;
-  reelToggle.setAttribute('aria-label', reelPlaying ? 'Pause the visual edit' : 'Play the visual edit');
-}
-
-function renderReel(time) {
-  const sceneTime = Math.min(time, reelDuration - 1);
-  for (const scene of reelScenes) {
-    scene.element.classList.toggle('is-active', sceneTime >= scene.start && sceneTime < scene.end);
-  }
-  if (reelProgress) reelProgress.style.transform = `scaleX(${clamp(time / reelDuration).toFixed(4)})`;
-  const seconds = Math.min(16, Math.floor(time / 1000));
-  if (reelTime) {
-    reelTime.value = `00:${String(seconds).padStart(2, '0')} / 00:16`;
-    reelTime.textContent = reelTime.value;
-  }
-}
-
-function tickReel(now) {
-  if (!reelPlaying) return;
-  reelElapsed = Math.min(reelDuration, now - reelStartedAt);
-  renderReel(reelElapsed);
-  if (reelElapsed >= reelDuration) {
-    reelPlaying = false;
-    setReelState();
-    return;
-  }
-  reelFrame = requestAnimationFrame(tickReel);
-}
-
-function playReel(reset = false) {
-  cancelAnimationFrame(reelFrame);
-  if (reset || reelElapsed >= reelDuration) {
-    reelElapsed = 0;
-    reelScenes.forEach((scene) => scene.element.classList.remove('is-active'));
-    if (reelStage) void reelStage.offsetWidth;
-    renderReel(0);
-  }
-  reelPlaying = true;
-  reelStartedAt = performance.now() - reelElapsed;
-  setReelState();
-  reelFrame = requestAnimationFrame(tickReel);
-}
-
-function pauseReel() {
-  reelPlaying = false;
-  cancelAnimationFrame(reelFrame);
-  setReelState();
-}
-
-function toggleReel() {
-  if (reelPlaying) pauseReel();
-  else playReel(reelElapsed >= reelDuration);
-}
-
-document.querySelectorAll('[data-open-reel]').forEach((button) =>
-  button.addEventListener('click', () => {
-    if (!reelDialog?.open) reelDialog?.showModal();
-    reelStage?.focus({ preventScroll: true });
-    playReel(true);
-  }),
-);
-
-document.querySelector('#close-reel')?.addEventListener('click', () => reelDialog?.close());
-reelToggle?.addEventListener('click', toggleReel);
-document.querySelector('#reel-restart')?.addEventListener('click', () => playReel(true));
-
-reelDialog?.addEventListener('close', () => {
-  pauseReel();
-  reelElapsed = 0;
-  renderReel(0);
-});
-
-reelDialog?.addEventListener('keydown', (event) => {
-  if (event.code === 'Space' && event.target === reelStage) {
-    event.preventDefault();
-    toggleReel();
-  }
-});
-
-/* ---------------------------------------------------------------------------
-   Dialogs, reveals, navigation, and the page loop
-   ------------------------------------------------------------------------ */
-function enableBackdropClose(dialog) {
-  dialog?.addEventListener('click', (event) => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    const inside =
-      event.clientX >= rect.left &&
-      event.clientX <= rect.right &&
-      event.clientY >= rect.top &&
-      event.clientY <= rect.bottom;
-    if (!inside) dialog.close();
-  });
-}
-
 const creditsDialog = document.querySelector('#credits-dialog');
-document.querySelector('#open-credits')?.addEventListener('click', () => creditsDialog?.showModal());
+document.querySelector('#open-credits')?.addEventListener('click', () => {
+  if (creditsDialog && !creditsDialog.open) creditsDialog.showModal();
+});
 document.querySelector('#close-credits')?.addEventListener('click', () => creditsDialog?.close());
-enableBackdropClose(formDialog);
-enableBackdropClose(creditsDialog);
 
-const revealItems = document.querySelectorAll('[data-reveal]');
-revealItems.forEach((element) => element.classList.add('reveal'));
-if ('IntersectionObserver' in window && !reduceMotion) {
-  const revealObserver = new IntersectionObserver(
-    (entries, observer) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.04, rootMargin: '0px 0px 12% 0px' },
-  );
-  revealItems.forEach((item) => revealObserver.observe(item));
-} else {
-  revealItems.forEach((item) => item.classList.add('is-visible'));
-}
-
-const chapters = navLinks
-  .map((link) => document.querySelector(link.getAttribute('href')))
-  .filter(Boolean);
-
-if ('IntersectionObserver' in window) {
-  const chapterObserver = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        navLinks.forEach((link) => {
-          const active = link.getAttribute('href') === `#${entry.target.id}`;
-          link.classList.toggle('is-active', active);
-          if (active) link.setAttribute('aria-current', 'location');
-          else link.removeAttribute('aria-current');
-        });
-      }
-    },
-    { rootMargin: '-45% 0px -45% 0px' },
-  );
-  chapters.forEach((chapter) => chapterObserver.observe(chapter));
-}
-
-window.addEventListener('scroll', requestPageUpdate, { passive: true });
-window.addEventListener('resize', requestPageUpdate);
-document.addEventListener('visibilitychange', requestPageUpdate);
-updatePage();
+/* ---------------------------------------------------------------------------
+   Boot.
+   ------------------------------------------------------------------------ */
+runPreloader().then(startStory);

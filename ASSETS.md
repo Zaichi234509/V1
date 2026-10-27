@@ -1,16 +1,34 @@
-# Image asset sources
+# Artwork & direction
 
-The website uses local WebP copies of artwork discovered through image search. The original artwork and characters belong to their respective creators and rights holders.
+Every picture on this site is **original anime-style artwork generated for it**. Nothing here
+borrows another artist's line, so no third-party image credits are owed. The character the page
+studies is still Muichiro Tokitō; the artwork is an original interpretation, not traced or copied
+from the anime or manga.
 
-| Local file(s) | Source page |
+| Local file | Used for |
 | --- | --- |
-| `public/images/hero.webp` | [SwordSlice — The Art of the Mist](https://swordslice.com/blogs/news/the-art-of-the-mist-muichiro-s-sword-and-fighting-style) |
-| `public/images/portrait.webp`, `public/images/action-mist.webp` | [Geekozi — Muichiro Tokito posters](https://geekozi.com/demon-slayer-posters/muichiro-tokito-posters) |
-| `public/images/quiet.webp` | [Wallpaper Cave — Mist Breathing wallpapers](https://wallpapercave.com/mist-breathing-wallpapers) |
-| `public/images/impact.webp`, `public/images/bright-action.webp` | [Wallpapers Clan — Muichiro Tokito Mist Breathing](https://wallpapers-clan.com/desktop-wallpapers/demon-slayer-muichiro-tokito-mist-breathing/) |
-| `public/images/dark.webp` | [4K Wallpapers — Muichiro Tokito](https://4kwallpapers.com/muichiro-tokito) |
-| `public/images/close.webp`, `public/images/leaves.webp` | [Alpha Coders — Muichiro Tokito wallpapers](https://alphacoders.com/muichiro-tokito-4k-wallpapers) |
+| `public/images/anime-hero.jpg` | The hero cel, form seven, the footer of the fly-through |
+| `public/images/anime-slash.jpg` | Forms one & four, the held cel in the index |
+| `public/images/anime-valley.jpg` | Forms three & five, and the painted valley backdrop inside the 3D scene |
+| `public/images/anime-close.jpg` | Form six and the Memory close cel |
+| `public/images/anime-impact.jpg` | The Obscuring Clouds full-bleed strike frame |
+| `public/images/anime-quiet.jpg` | The colophon's quiet stream |
 
-These assets are used for a fan-made, non-commercial character study. Source links are also available from the website footer.
+## Direction
 
-Technique names and descriptions were checked against the [Mist Breathing reference](https://kimetsu-no-yaiba.fandom.com/wiki/Mist_Breathing) and rewritten for the site.
+The scroll story follows the public description of the **kaminari** template on
+[uberdesigner.ai](https://uberdesigner.ai/t/kaminari) — a one-page story drawn like an anime short,
+cel-shaded with ink outlines, on a single scroll-scrubbed timeline with film-style cards and
+telemetry pinned to 3D points. That description is public on the template page; the code, palette,
+type and 3D here were built from scratch in Vite and Three.js and are not derived from the
+template's paid prompt, project or Figma file. The first build of this page followed the pinned
+poster direction from [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill).
+
+Technique names and descriptions were checked against the
+[Mist Breathing reference](https://kimetsu-no-yaiba.fandom.com/wiki/Mist_Breathing) and rewritten
+for the site.
+
+## Rights
+
+Demon Slayer: Kimetsu no Yaiba © Koyoharu Gotouge / SHUEISHA, Aniplex, ufotable. This page is a
+fan-made, non-commercial study.

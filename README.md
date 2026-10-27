@@ -1,12 +1,14 @@
-# Into the Mist — Muichiro Tokitō
+# Into the Mist — Muichiro Tokitō, an anime scroll story
 
-A cinematic character study of Muichiro Tokitō, the Mist Hashira, built as a scrolling poster.
+A cinematic character study of Muichiro Tokitō, the Mist Hashira, rebuilt as **one scrubbed
+timeline drawn like an anime short**.
 
-The layout follows the **pinned poster** direction from
-[`leonxlnx/taste-skill`](https://github.com/leonxlnx/taste-skill) (tasteskill v2): something holds
-still while everything else moves past it. The hero's name is pinned across the viewport while his
-portraits and the ground colour change beneath it; the seven-form index scrolls past a held
-photograph; a scroll-driven 3D fly-through carries the mist and the blade.
+The direction follows the public description of the **kaminari** template on
+[uberdesigner.ai](https://uberdesigner.ai/t/kaminari): cel-shaded subjects with ink outlines, a
+painted valley backdrop, one scroll-scrubbed camera timeline, film-style headlines that blur in
+word by word, and telemetry boxes pinned to points in the 3D. Everything is rebuilt here from
+scratch in Vite and Three.js, with original generated anime-style artwork (see
+[ASSETS.md](ASSETS.md)).
 
 ## Run the website
 
@@ -24,52 +26,58 @@ npm run preview
 
 ## The idea
 
-> On this page, **the seven forms of Mist Breathing** become **a flight through mist that ends on the
-> blade**.
-
-The visitor can do one thing the page is built around: scroll through the fly-through. Seven plates,
-one per form, hang in fog at different depths; the camera slides past them, the fog thins as the
-blade arrives, and the last screen turns the blade broadside. The canvas can also be dragged to look
-around, the arrow keys work when it is focused, **R** resets the view, and motion can be paused.
+> On this page, **the seven forms of Mist Breathing** become **one film you scrub with the
+> scrollbar** — wide over the valley, down into the fog, past seven hanging plates, close on the
+> blade, then broadside into the clear.
 
 ## Sections
 
-1. **The title** — `MUICHIRO` pinned over two portraits; the ground and the portrait change under the name as you scroll.
-2. **Seven forms** — a held photograph on the left, the full technique index on the right; pointing at a form changes the photograph, selecting one opens the full description.
-3. **The blade** — the 3D scroll fly-through (Three.js, dynamically imported).
-4. **Obscuring Clouds** — a full-bleed frame with one card and a live "strike the frame" impact.
-5. **Memory** — who he was, as a record sheet beside a close crop.
-6. **Colophon** — the footer as a designed close: photograph half, menu half.
+1. **The hero** — one full-bleed cel; the name blurs in word by word over a counting slate.
+2. **The story** — a 720vh sticky stage. Scrolling scrubs one Three.js timeline: the painted
+   valley, the dive into fog, seven form plates hanging at depth, the cel-shaded katana turning
+   broadside. Three telemetry boxes pin themselves to the blade tip, the guard and the mist; film
+   headlines blur in per beat. The canvas can be dragged to look around, arrow keys work when it is
+   focused, **R** resets, and motion can be paused.
+3. **The seven forms** — a held cel on the left, the full technique index on the right; pointing at
+   a form changes the cel, selecting one opens the full description.
+4. **Obscuring Clouds** — a full-bleed strike frame with one card and a live "strike the frame" hit.
+5. **Memory** — the record sheet beside a close cel.
+6. **Colophon** — the footer as a designed close: quiet stream half, menu half.
+
+Reduced motion, missing WebGL or a failed module all swap the fly-through for the finished
+composition — the seven forms as a still grid.
 
 ## Art direction
 
-- **Direction:** pinned poster — a fixed element, a changing one.
-- **Type:** Hanken Grotesk (one family) with Noto Serif JP for the Japanese, bundled locally via `@fontsource` and a subsetted JP font.
-- **Colour:** pale mist ground `#dde9e6`, night-teal ink `#0a1d24`, deep field `#08191f`, one accent `#0d5b62`.
+- **Direction:** kaminari — the anime short: cel shading, ink outlines, one scrubbed timeline.
+- **Type:** Hanken Grotesk for the latin voice, JetBrains Mono for slates and telemetry, Noto Serif
+  JP for the Japanese; all bundled locally, no browser-facing CDNs.
+- **Colour:** ink ground `#07090c`, cel white `#f1f6f4`, mist teal `#6fe0c8`, one strike vermilion
+  `#ff4b33`.
 - **Motion:** scroll-linked only. Nothing captures the wheel; the scrollbar always tells the truth.
-
-Reduced motion swaps the fly-through for the finished composition — the seven forms as a still grid.
-If WebGL is unavailable or the module fails, the same still grid appears instead.
 
 ## Files
 
 | File | What it holds |
 | --- | --- |
-| `index.html` | The page, the dialogs, and the 16-second edit. |
-| `src/main.js` | Pinned hero, form index and dialog, reel player, reveals. |
-| `src/fly-scene.js` | The scroll-driven 3D fly-through: plates drawn to canvas, camera, fog. |
-| `src/katana.js` | The Nichirin blade and mist-trail geometry. |
+| `index.html` | The page, the preloader and the dialogs. |
+| `src/main.js` | Preloader, word-blur, story wiring, form index and dialog, strike, reveals. |
+| `src/anime-scene.js` | The scrubbed cel-shaded timeline: camera shots, plates, mist, anchors. |
+| `src/katana.js` | The Nichirin blade in toon shading with inverted-hull ink outlines. |
 | `src/styles.css` | Design tokens and every section's composition. |
-| `src/reel.css` | The full-screen visual edit player. |
 | `src/jp-font.css` | The subsetted Japanese web fonts. |
-
-## Assets
-
-Artwork is local (see [ASSETS.md](ASSETS.md)); there are no browser-facing CDNs. The page carries no
-video: the only clip in this repository is of an unrelated character, and no honest footage of
-Muichiro exists here, so the moving picture is the 3D scene instead.
+| `scripts/shoot.mjs` | The look-and-fix loop: screenshots the running site into `renders/`. |
 
 Run `npm run subset:fonts` after changing the Japanese copy.
+
+## Look-and-fix
+
+With the dev server running, render the page to PNGs and look at them before calling the work
+done (writes to `renders/`, which is git-ignored):
+
+```bash
+node scripts/shoot.mjs
+```
 
 ## Video toolkit
 
