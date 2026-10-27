@@ -1,12 +1,37 @@
 import * as THREE from 'three';
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const mix = (a, b, t) => a + (b - a) * t;
-const smooth = (t) => t * t * (3 - 2 * t);
+/* The Nichirin blade, drawn the way the anime short would draw it:
+   flat cel shading plus a hard ink outline (an inverted hull). */
 
-/* The Nichirin blade: a slightly curved blade, a dark guard, a wrapped grip. */
-export function createKatana() {
+const INK = 0x05080a;
+
+/** A three-step cel ramp: shadow, mid, lit. */
+export function createCelRamp() {
+  const data = new Uint8Array([70, 70, 70, 255, 160, 160, 160, 255, 255, 255, 255, 255]);
+  const texture = new THREE.DataTexture(data, 3, 1, THREE.RGBAFormat);
+  texture.minFilter = THREE.NearestFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/** Ink outline: a slightly inflated back-facing copy of a mesh. */
+export function addInkOutline(mesh, thickness = 0.035) {
+  const outline = new THREE.Mesh(
+    mesh.geometry,
+    new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide }),
+  );
+  outline.scale.setScalar(1 + thickness);
+  outline.renderOrder = -1;
+  mesh.add(outline);
+  return outline;
+}
+
+export function createKatana(ramp) {
   const sword = new THREE.Group();
+
+  const cel = (color, emissive = 0x000000, emissiveIntensity = 0) =>
+    new THREE.MeshToonMaterial({ color, gradientMap: ramp, emissive, emissiveIntensity });
 
   const bladeShape = new THREE.Shape();
   bladeShape.moveTo(0, -0.095);
@@ -26,42 +51,34 @@ export function createKatana() {
   });
   bladeGeometry.translate(0, 0, -0.0275);
 
+  // The blade reads as pale steel with a cold glow along the edge.
   const blade = new THREE.Mesh(
     bladeGeometry,
-    new THREE.MeshPhysicalMaterial({
-      color: 0xd6f2ef,
-      emissive: 0x2a7480,
-      emissiveIntensity: 0.95,
-      metalness: 0.55,
-      roughness: 0.26,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.18,
-      side: THREE.DoubleSide,
+    new THREE.MeshToonMaterial({
+      color: 0xdff6f2,
+      gradientMap: ramp,
+      emissive: 0x1d5f66,
+      emissiveIntensity: 0.8,
     }),
   );
+  addInkOutline(blade, 0.03);
   sword.add(blade);
-
-  sword.add(
-    new THREE.LineSegments(
-      new THREE.EdgesGeometry(bladeGeometry, 24),
-      new THREE.LineBasicMaterial({ color: 0xd9ffff, transparent: true, opacity: 0.5 }),
-    ),
-  );
 
   const groove = new THREE.Mesh(
     new THREE.BoxGeometry(3.72, 0.018, 0.009),
-    new THREE.MeshBasicMaterial({ color: 0x2f5b62, transparent: true, opacity: 0.7 }),
+    new THREE.MeshBasicMaterial({ color: 0x2f5b62, transparent: true, opacity: 0.75 }),
   );
   groove.position.set(2.03, 0.032, 0.047);
   sword.add(groove);
 
-  const darkMetal = new THREE.MeshStandardMaterial({ color: 0x0b2126, metalness: 0.8, roughness: 0.34 });
-  const paleMetal = new THREE.MeshStandardMaterial({ color: 0x7fb5b2, metalness: 0.85, roughness: 0.26 });
-  const gripMaterial = new THREE.MeshStandardMaterial({ color: 0x061318, metalness: 0.14, roughness: 0.76 });
-  const wrapMaterial = new THREE.MeshStandardMaterial({ color: 0xa2d8d1, metalness: 0.2, roughness: 0.56 });
+  const darkMetal = cel(0x101c21);
+  const paleMetal = cel(0x8fc4c0);
+  const gripMaterial = cel(0x0a1418);
+  const wrapMaterial = cel(0xb7e3dc);
 
   const guard = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.085, 40), darkMetal);
   guard.rotation.z = Math.PI / 2;
+  addInkOutline(guard, 0.06);
   sword.add(guard);
 
   const guardRing = new THREE.Mesh(new THREE.TorusGeometry(0.255, 0.025, 8, 40), paleMetal);
@@ -76,6 +93,7 @@ export function createKatana() {
   const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.12, 1.48, 16), gripMaterial);
   grip.rotation.z = Math.PI / 2;
   grip.position.x = -0.79;
+  addInkOutline(grip, 0.05);
   sword.add(grip);
 
   for (const x of [-0.09, -1.5]) {
@@ -104,7 +122,7 @@ export function createKatana() {
   return sword;
 }
 
-/* Mist trails: three thin tubes that unwind behind the blade. */
+/* Mist trails: three thin ink-and-light ribbons that unwind behind the blade. */
 export function createRibbon(index) {
   const points = [];
   for (let step = 0; step < 11; step += 1) {
@@ -123,9 +141,9 @@ export function createRibbon(index) {
   return new THREE.Mesh(
     new THREE.TubeGeometry(curve, 120, 0.009 + index * 0.003, 5, false),
     new THREE.MeshBasicMaterial({
-      color: index === 1 ? 0xe3ffff : 0x69cfc9,
+      color: index === 1 ? 0xe9ffff : 0x6fe0c8,
       transparent: true,
-      opacity: 0.16 - index * 0.02,
+      opacity: 0.18 - index * 0.02,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     }),
